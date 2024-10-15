@@ -76,6 +76,16 @@ CREATE TABLE Modules (
     FOREIGN KEY (CourseID) REFERENCES Courses(CourseID)
 );
 
+-- Create Parts table
+CREATE TABLE Parts (
+    PartID INT PRIMARY KEY IDENTITY(1,1),
+    ModuleID INT,
+    Title NVARCHAR(255) NOT NULL,
+    Description NTEXT,
+    OrderInModule INT NOT NULL,
+    FOREIGN KEY (ModuleID) REFERENCES Modules(ModuleID)
+);
+
 -- Create LessonTypes table
 CREATE TABLE LessonTypes (
     LessonTypeID INT PRIMARY KEY IDENTITY(1,1),
@@ -85,12 +95,12 @@ CREATE TABLE LessonTypes (
 -- Create Lessons table
 CREATE TABLE Lessons (
     LessonID INT PRIMARY KEY IDENTITY(1,1),
-    ModuleID INT,
+    PartID INT,
     LessonTypeID INT,
     Title NVARCHAR(255) NOT NULL,
     Description NTEXT,
-    OrderInModule INT NOT NULL,
-    FOREIGN KEY (ModuleID) REFERENCES Modules(ModuleID),
+    OrderInPart INT NOT NULL,
+    FOREIGN KEY (PartID) REFERENCES Parts(PartID),
     FOREIGN KEY (LessonTypeID) REFERENCES LessonTypes(LessonTypeID)
 );
 
@@ -147,12 +157,16 @@ CREATE TABLE Enrollments (
 CREATE TABLE Progresses (
     ProgressID INT PRIMARY KEY IDENTITY(1,1),
     UserID INT,
-    LessonID INT,
+    PartID INT,
     CompletionStatus BIT NOT NULL DEFAULT 0,
     CompletionDate DATETIME,
     FOREIGN KEY (UserID) REFERENCES Users(UserID),
-    FOREIGN KEY (LessonID) REFERENCES Lessons(LessonID)
+    FOREIGN KEY (PartID) REFERENCES Parts(PartID)
 );
+
+-- Add a composite unique constraint to ensure a user can't have multiple progress records for the same part
+ALTER TABLE Progresses
+ADD CONSTRAINT UQ_UserPart UNIQUE (UserID, PartID);
 
 -- Create Transactions table
 CREATE TABLE Transactions (
@@ -185,7 +199,3 @@ CREATE TABLE AdminLogs (
     ActionDate DATETIME NOT NULL DEFAULT GETDATE(),
     FOREIGN KEY (AdminID) REFERENCES Users(UserID)
 );
-
--- Add Image column for Courses
-ALTER TABLE Courses
-    ADD Image NVARCHAR(MAX);
