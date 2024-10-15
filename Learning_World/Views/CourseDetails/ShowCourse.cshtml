@@ -1,0 +1,784 @@
+﻿@* old code *@
+@* @model Course
+<div class="container alert-secondary">
+<h1>@Model.Title</h1>
+@foreach (var item in Model.Users)
+{
+    <h1>Instructor: @item.Name</h1>
+}
+<div class="justify-content-start">
+        <a class="btn btn-primary" asp-action="SignOut" asp-controller="Account">Enroll</a>
+</div>
+<div>
+        <span><strong><span>74,335</span></strong> already enrolled</span>
+</div>
+</div>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Level</th>
+            <th scope="col">CreationDate</th>
+            <th scope="col">UpdatedDate</th>
+            <th scope="col">PublicationStatus</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.DifficultyLevel Level</td>
+            <td>@Model.CreationDate.ToString("dd-MM-yyyy")</td>
+            <td>@Model.LastUpdateDate.ToString("dd-MM-yyyy")</td>
+            <td>@Model.PublicationStatus</td>
+        </tr>
+    </tbody>
+</table>
+
+<div>
+    <h1>Description</h1>
+    <p>@Model.Description</p>
+</div>
+<h1>Modules</h1>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (ViewBag.parts != null && ViewBag.modules != null)
+        {
+            var partsList = (IEnumerable<Part>)ViewBag.parts;
+            var lessonList = (IEnumerable<Lesson>)ViewBag.lessons; // Correct cast to IEnumerable<Lesson>
+
+            foreach (var item in ViewBag.modules)
+            {
+                <tr>
+                    <td>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>@item.Title</div>
+                            <div><a>Module details <i class="bi bi-arrow-down-square"></i></a></div>
+                        </div>
+                        @item.Description<br>
+                        <a>Show Info About Module Content</a><br>
+                        parts<br>
+                        @foreach (var part in partsList.Where(p => p.ModuleId == item.ModuleId))
+                        {
+                            @part.PartId
+                            <br>
+                            @foreach (var lesson in lessonList.Where(p => p.PartId == part.PartId)) // Correct filtering for Lesson
+                            {
+                                @lesson.LessonId
+                                <br>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+    </table> *@
+    @* new code **** *@
+@* @model Course
+<div class="container alert-secondary">
+    <h1>@Model.Title</h1>
+    @foreach (var item in Model.Users)
+    {
+        <h1>Instructor: @item.Name</h1>
+    }
+    <div class="justify-content-start">
+        <a class="btn btn-primary" asp-action="SignOut" asp-controller="Account">Enroll</a>
+    </div>
+    <div>
+        <span><strong><span>74,335</span></strong> already enrolled</span>
+    </div>
+</div>
+
+<!-- Course Details Table -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Level</th>
+            <th scope="col">CreationDate</th>
+            <th scope="col">UpdatedDate</th>
+            <th scope="col">PublicationStatus</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.DifficultyLevel Level</td>
+            <td>@Model.CreationDate.ToString("dd-MM-yyyy")</td>
+            <td>@Model.LastUpdateDate.ToString("dd-MM-yyyy")</td>
+            <td>@Model.PublicationStatus</td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Course Description -->
+<div>
+    <h1>Description</h1>
+    <p>@Model.Description</p>
+</div>
+
+<!-- Module Section with Improved Design, Icon Toggle, and Close Feature -->
+<h1>Modules</h1>
+<div class="accordion" id="course-modules">
+    @if (ViewBag.parts != null && ViewBag.modules != null)
+    {
+        var partsList = (IEnumerable<Part>)ViewBag.parts;
+        var lessonList = (IEnumerable<Lesson>)ViewBag.lessons;
+
+        foreach (var module in ViewBag.modules)
+        {
+            <div class="accordion-item mb-3">
+                <!-- Module Header with Icon -->
+                <h2 class="accordion-header d-flex justify-content-between align-items-center">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#module-@module.ModuleId" aria-expanded="false">
+                        @module.Title
+                    </button>
+                    <!-- Icon Toggle Button -->
+                    <i class="bi bi-info-circle" onclick="toggleModule(@module.ModuleId)" id="toggle-icon-@module.ModuleId" style="cursor:pointer;"></i>
+                </h2>
+
+                <!-- Module Description and Content (Initially Hidden) -->
+                <div id="module-@module.ModuleId" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <!-- Module Description -->
+                        <div id="module-description-@module.ModuleId">
+                            <h4>Description</h4>
+                            <p>@module.Description</p>
+
+                            <!-- Show Module Content Info Button -->
+                            <a href="javascript:void(0)" class="btn btn-outline-primary" onclick="toggleContentInfo(@module.ModuleId)" id="content-info-btn-@module.ModuleId">
+                                Show Module Content
+                            </a>
+
+                            <!-- Module Content (Hidden Initially) -->
+                            <div id="module-content-@module.ModuleId" style="display:none;" class="mt-3">
+                                <h5>Content Overview:</h5>
+
+                                <!-- Number of videos in the module -->
+                                <h6>Videos (@lessonList.Count(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 1))</h6>
+                                @foreach (var video in lessonList.Where(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 1))
+                                {
+                                    <p>Video: @video.Title - @video.Description</p>
+                                }
+
+                                <!-- Number of quizzes in the module -->
+                                <h6>Quizzes (@lessonList.Count(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 3))</h6>
+                                @foreach (var quiz in lessonList.Where(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 3))
+                                {
+                                    <p>Quiz: @quiz.Title - @quiz.Description</p>
+                                }
+
+                                <!-- Number of text lessons in the module -->
+                                <h6>Texts (@lessonList.Count(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 2))</h6>
+                                @foreach (var text in lessonList.Where(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 2))
+                                {
+                                    <p>Text: @text.Title - @text.Description</p>
+                                }
+                            </div>
+
+                            <!-- Close Module Button -->
+                            <a href="javascript:void(0)" class="btn btn-outline-danger mt-2" onclick="closeModule(@module.ModuleId)">
+                                Close Module
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        // Function to toggle showing/hiding module content with icons
+        function toggleModule(moduleId) {
+            var icon = document.getElementById('toggle-icon-' + moduleId);
+            var module = document.getElementById('module-' + moduleId);
+
+            if (module.classList.contains('show')) {
+                icon.classList.remove('bi-arrow-up-square');
+                icon.classList.add('bi-info-circle');
+            } else {
+                icon.classList.remove('bi-info-circle');
+                icon.classList.add('bi-arrow-up-square');
+            }
+        }
+
+        // Function to toggle showing/hiding module content
+        function toggleContentInfo(moduleId) {
+            var content = document.getElementById('module-content-' + moduleId);
+            var contentBtn = document.getElementById('content-info-btn-' + moduleId);
+
+            if (content.style.display === "none") {
+                content.style.display = "block";
+                contentBtn.innerHTML = 'Hide Module Content';
+            } else {
+                content.style.display = "none";
+                contentBtn.innerHTML = 'Show Module Content';
+            }
+        }
+
+        // Function to close the module
+        function closeModule(moduleId) {
+            var module = document.getElementById('module-' + moduleId);
+            var icon = document.getElementById('toggle-icon-' + moduleId);
+
+            // Collapse the module and reset icon
+            module.classList.remove('show');
+            icon.classList.remove('bi-arrow-up-square');
+            icon.classList.add('bi-info-circle');
+        }
+    </script>
+} *@
+@* @model Course
+<div class="container alert alert-secondary mt-5">
+    <h1 class="display-4 text-center">@Model.Title</h1>
+    <div class="text-center mb-4">
+        @foreach (var item in Model.Users)
+        {
+            <h5>Instructor: @item.Name</h5>
+        }
+        <a class="btn btn-primary btn-lg" asp-action="SignOut" asp-controller="Account">Enroll</a>
+        <p class="mt-2"><strong><span>74,335</span></strong> already enrolled</p>
+    </div>
+</div>
+
+<!-- Course Details Table -->
+<div class="cds-9 css-0 cds-11 cds-grid-item cds-56">
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Level</th>
+                <th scope="col">Creation Date</th>
+                <th scope="col">Updated Date</th>
+                <th scope="col">Publication Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Model.DifficultyLevel Level</td>
+                <td>@Model.CreationDate.ToString("dd-MM-yyyy")</td>
+                <td>@Model.LastUpdateDate.ToString("dd-MM-yyyy")</td>
+                <td>@Model.PublicationStatus</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Course Description -->
+<div class="container my-4">
+    <h2>Description</h2>
+    <p>@Model.Description</p>
+</div>
+
+<!-- Module Section -->
+<div class="container my-4">
+    <h2>Modules</h2>
+    <div class="accordion" id="course-modules">
+        @if (ViewBag.parts != null && ViewBag.modules != null)
+        {
+            var partsList = (IEnumerable<Part>)ViewBag.parts;
+            var lessonList = (IEnumerable<Lesson>)ViewBag.lessons;
+
+            foreach (var module in ViewBag.modules)
+            {
+                <div class="accordion-item mb-3">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#module-@module.ModuleId" aria-expanded="false">
+                            @module.Title
+                        </button>
+                        <i class="bi bi-info-circle" onclick="toggleModule(@module.ModuleId)" id="toggle-icon-@module.ModuleId" style="cursor:pointer;"></i>
+                    </h2>
+
+                    <div id="module-@module.ModuleId" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            <h4>Description</h4>
+                            <p>@module.Description</p>
+                            <a href="javascript:void(0)" class="btn btn-outline-primary" onclick="toggleContentInfo(@module.ModuleId)" id="content-info-btn-@module.ModuleId">
+                                Show Module Content
+                            </a>
+                            <div id="module-content-@module.ModuleId" style="display:none;" class="mt-3">
+                                <h5>Content Overview:</h5>
+
+                                <!-- Number of videos in the module -->
+                                <h6>Videos (@lessonList.Count(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 1))</h6>
+                                @foreach (var video in lessonList.Where(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 1))
+                                {
+                                    <p>Video: @video.Title - @video.Description</p>
+                                }
+
+                                <!-- Number of quizzes in the module -->
+                                <h6>Quizzes (@lessonList.Count(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 3))</h6>
+                                @foreach (var quiz in lessonList.Where(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 3))
+                                {
+                                    <p>Quiz: @quiz.Title - @quiz.Description</p>
+                                }
+
+                                <!-- Number of text lessons in the module -->
+                                <h6>Texts (@lessonList.Count(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 2))</h6>
+                                @foreach (var text in lessonList.Where(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 2))
+                                {
+                                    <p>Text: @text.Title - @text.Description</p>
+                                }
+                            </div>
+                            <a href="javascript:void(0)" class="btn btn-outline-danger mt-2" onclick="closeModule(@module.ModuleId)">
+                                Close Module
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        function toggleModule(moduleId) {
+            var icon = document.getElementById('toggle-icon-' + moduleId);
+            var module = document.getElementById('module-' + moduleId);
+
+            if (module.classList.contains('show')) {
+                icon.classList.remove('bi-arrow-up-square');
+                icon.classList.add('bi-info-circle');
+            } else {
+                icon.classList.remove('bi-info-circle');
+                icon.classList.add('bi-arrow-up-square');
+            }
+        }
+
+        function toggleContentInfo(moduleId) {
+            var content = document.getElementById('module-content-' + moduleId);
+            var contentBtn = document.getElementById('content-info-btn-' + moduleId);
+
+            if (content.style.display === "none") {
+                content.style.display = "block";
+                contentBtn.innerHTML = 'Hide Module Content';
+            } else {
+                content.style.display = "none";
+                contentBtn.innerHTML = 'Show Module Content';
+            }
+        }
+
+        function closeModule(moduleId) {
+            var module = document.getElementById('module-' + moduleId);
+            var icon = document.getElementById('toggle-icon-' + moduleId);
+
+            module.classList.remove('show');
+            icon.classList.remove('bi-arrow-up-square');
+            icon.classList.add('bi-info-circle');
+        }
+    </script>
+} *@
+@* @model Course
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@Model.Title - Course Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <header class="bg-primary text-white py-5">
+        <div class="container">
+            <h1 class="display-4 fw-bold">@Model.Title</h1>
+            @foreach (var item in Model.Users)
+            {
+                <p class="lead">Instructor: @item.Name</p>
+            }
+            <a href="#" class="btn btn-light btn-lg mt-3">Enroll Now</a>
+        </div>
+    </header>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Level</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                @Model.DifficultyLevel
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Created</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                @Model.CreationDate.ToString("dd-MM-yyyy")
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Updated</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                @Model.LastUpdateDate.ToString("dd-MM-yyyy")
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Status</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                @Model.PublicationStatus
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="card-title">About this Course</h2>
+                        <p class="card-text">@Model.Description</p>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="card-title mb-4">Course Content</h2>
+                        @if (ViewBag.parts != null && ViewBag.modules != null)
+                        {
+                            var partsList = (IEnumerable<Part>)ViewBag.parts;
+                            var lessonList = (IEnumerable<Lesson>)ViewBag.lessons;
+
+                            foreach (var module in ViewBag.modules)
+                            {
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                                            @module.Title
+                                            <button class="btn btn-link" type="button" data-bs-toggle="collapse"
+                                                    data-bs-target="#module-@module.ModuleId" onclick="toggleModule(@module.ModuleId)">
+                                                <i id="toggle-icon-@module.ModuleId" class="bi bi-info-circle"></i>
+                                            </button>
+                                        </h5>
+                                    </div>
+                                    <div id="module-@module.ModuleId" class="collapse">
+                                        <div class="card-body">
+                                            <p>@module.Description</p>
+
+                                            <h6 class="mt-3">Content Overview:</h6>
+                                            <ul class="list-unstyled">
+                                                <li>
+                                                    <button class="btn btn-link" onclick="toggleContent('videos-@module.ModuleId')">
+                                                        @lessonList.Count(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 1) Videos
+                                                    </button>
+                                                    <div id="videos-@module.ModuleId" style="display: none;">
+                                                        <ul>
+                                                            @foreach (var video in lessonList.Where(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 1))
+                                                            {
+                                                                <li>@video.Title: @video.Description</li>
+                                                            }
+                                                        </ul>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <button class="btn btn-link" onclick="toggleContent('readings-@module.ModuleId')">
+                                                        @lessonList.Count(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 2) Readings
+                                                    </button>
+                                                    <div id="readings-@module.ModuleId" style="display: none;">
+                                                        <ul>
+                                                            @foreach (var reading in lessonList.Where(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 2))
+                                                            {
+                                                                <li>@reading.Title: @reading.Description</li>
+                                                            }
+                                                        </ul>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <button class="btn btn-link" onclick="toggleContent('quizzes-@module.ModuleId')">
+                                                        @lessonList.Count(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 3) Quizzes
+                                                    </button>
+                                                    <div id="quizzes-@module.ModuleId" style="display: none;">
+                                                        <ul>
+                                                            @foreach (var quiz in lessonList.Where(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 3))
+                                                            {
+                                                                <li>@quiz.Title: @quiz.Description</li>
+                                                            }
+                                                        </ul>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title">Course Stats</h4>
+                        <p class="card-text"><strong>74,335</strong> already enrolled</p>
+                    </div>
+                </div>
+                <!-- Add more sidebar content here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    @section Scripts {
+        <script type="text/javascript">
+            function toggleModule(moduleId) {
+                var icon = document.getElementById('toggle-icon-' + moduleId);
+                var module = document.getElementById('module-' + moduleId);
+
+                if (module.classList.contains('show')) {
+                    // Close the module if it's currently open
+                    module.classList.remove('show');
+                    icon.classList.remove('bi-arrow-up-square');
+                    icon.classList.add('bi-info-circle');
+
+                    // Hide all related content sections
+                    closeAllContent(moduleId);
+                } else {
+                    // Open the module if it's currently closed
+                    module.classList.add('show');
+                    icon.classList.remove('bi-info-circle');
+                    icon.classList.add('bi-arrow-up-square');
+                }
+            }
+
+            function closeAllContent(moduleId) {
+                var contentIds = ['videos-' + moduleId, 'readings-' + moduleId, 'quizzes-' + moduleId];
+                contentIds.forEach(function (contentId) {
+                    var content = document.getElementById(contentId);
+                    if (content) {
+                        content.style.display = "none"; // Hide content sections
+                    }
+                });
+            }
+
+            function toggleContent(contentId) {
+                var content = document.getElementById(contentId);
+                if (content.style.display === "none") {
+                    content.style.display = "block";
+                } else {
+                    content.style.display = "none";
+                }
+            }
+        </script>
+    }
+</body>
+</html>
+ *@
+ @model Course
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@Model.Title - Course Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <header class="bg-primary text-white py-5">
+        <div class="container">
+            <h1 class="display-4 fw-bold">@Model.Title</h1>
+            @foreach (var item in Model.Users)
+            {
+                <p class="lead">Instructor: @item.Name</p>
+            }
+            <a href="#" class="btn btn-light btn-lg mt-3">Enroll Now</a>
+        </div>
+    </header>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Level</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                @Model.DifficultyLevel
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Created</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                @Model.CreationDate.ToString("dd-MM-yyyy")
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Updated</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                @Model.LastUpdateDate.ToString("dd-MM-yyyy")
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Status</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                @Model.PublicationStatus
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="card-title">About this Course</h2>
+                        <p class="card-text">@Model.Description</p>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="card-title mb-4">Course Content</h2>
+                        @if (ViewBag.parts != null && ViewBag.modules != null)
+                        {
+                            var partsList = (IEnumerable<Part>)ViewBag.parts;
+                            var lessonList = (IEnumerable<Lesson>)ViewBag.lessons;
+
+                            foreach (var module in ViewBag.modules)
+                            {
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                                            @module.Title
+                                            <button class="btn btn-link" type="button" data-bs-toggle="collapse"
+                                                    data-bs-target="#module-@module.ModuleId">
+                                                <i id="toggle-icon-@module.ModuleId" class="bi bi-info-circle"></i>
+                                            </button>
+                                        </h5>
+                                    </div>
+                                    <div id="module-@module.ModuleId" class="collapse">
+                                        <div class="card-body">
+                                            <p>@module.Description</p>
+
+                                            <h6 class="mt-3">Content Overview:</h6>
+                                            <ul class="list-unstyled">
+                                                <li>
+                                                    <button class="btn btn-link" onclick="toggleContent('videos-@module.ModuleId')">
+                                                        @lessonList.Count(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 1) Videos
+                                                    </button>
+                                                    <div id="videos-@module.ModuleId" style="display: none;">
+                                                        <ul>
+                                                            @foreach (var video in lessonList.Where(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 1))
+                                                            {
+                                                                <li>@video.Title: @video.Description</li>
+                                                            }
+                                                        </ul>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <button class="btn btn-link" onclick="toggleContent('readings-@module.ModuleId')">
+                                                        @lessonList.Count(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 2) Readings
+                                                    </button>
+                                                    <div id="readings-@module.ModuleId" style="display: none;">
+                                                        <ul>
+                                                            @foreach (var reading in lessonList.Where(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 2))
+                                                            {
+                                                                <li>@reading.Title: @reading.Description</li>
+                                                            }
+                                                        </ul>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <button class="btn btn-link" onclick="toggleContent('quizzes-@module.ModuleId')">
+                                                        @lessonList.Count(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 3) Quizzes
+                                                    </button>
+                                                    <div id="quizzes-@module.ModuleId" style="display: none;">
+                                                        <ul>
+                                                            @foreach (var quiz in lessonList.Where(l => l.Part.ModuleId == module.ModuleId && l.LessonTypeId == 3))
+                                                            {
+                                                                <li>@quiz.Title: @quiz.Description</li>
+                                                            }
+                                                        </ul>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title">Course Stats</h4>
+                        <p class="card-text"><strong>74,335</strong> already enrolled</p>
+                    </div>
+                </div>
+                <!-- Add more sidebar content here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    @section Scripts {
+        <script type="text/javascript">
+            document.addEventListener("DOMContentLoaded", function () {
+                var modules = document.querySelectorAll('.collapse');
+
+                modules.forEach(function (module) {
+                    module.addEventListener('show.bs.collapse', function () {
+                        var icon = document.getElementById('toggle-icon-' + module.id.split('-')[1]);
+                        icon.classList.remove('bi-info-circle');
+                        icon.classList.add('bi-arrow-up-square');
+                    });
+
+                    module.addEventListener('hide.bs.collapse', function () {
+                        var icon = document.getElementById('toggle-icon-' + module.id.split('-')[1]);
+                        icon.classList.remove('bi-arrow-up-square');
+                        icon.classList.add('bi-info-circle');
+                        closeAllContent(module.id.split('-')[1]); // Close all content when the module is hidden
+                    });
+                });
+            });
+
+            function closeAllContent(moduleId) {
+                var contentIds = ['videos-' + moduleId, 'readings-' + moduleId, 'quizzes-' + moduleId];
+                contentIds.forEach(function (contentId) {
+                    var content = document.getElementById(contentId);
+                    if (content) {
+                        content.style.display = "none"; // Hide content sections
+                    }
+                });
+            }
+
+            function toggleContent(contentId) {
+                var content = document.getElementById(contentId);
+                if (content.style.display === "none") {
+                    content.style.display = "block";
+                } else {
+                    content.style.display = "none";
+                }
+            }
+        </script>
+    }
+</body>
+</html>
+
+
+
