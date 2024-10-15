@@ -7,7 +7,7 @@ public partial class Lesson
 {
     public int LessonId { get; set; }
 
-    public int? ModuleId { get; set; }
+    public int? PartId { get; set; }
 
     public int? LessonTypeId { get; set; }
 
@@ -15,7 +15,7 @@ public partial class Lesson
 
     public string? Description { get; set; }
 
-    public int OrderInModule { get; set; }
+    public int OrderInPart { get; set; }
 
     public virtual LessonQuiz? LessonQuiz { get; set; }
 
@@ -25,7 +25,5 @@ public partial class Lesson
 
     public virtual LessonVideo? LessonVideo { get; set; }
 
-    public virtual Module? Module { get; set; }
-
-    public virtual ICollection<Progress> Progresses { get; set; } = new List<Progress>();
+    public virtual Part? Part { get; set; }
 }

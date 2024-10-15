@@ -17,5 +17,5 @@ public partial class Module
 
     public virtual Course? Course { get; set; }
 
-    public virtual ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
+    public virtual ICollection<Part> Parts { get; set; } = new List<Part>();
 }
