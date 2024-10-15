@@ -1,4 +1,4 @@
-namespace Learning_World.Models
+namespace Learning_World.ViewModels
 {
     public class ErrorViewModel
     {
