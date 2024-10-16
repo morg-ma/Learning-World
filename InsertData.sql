@@ -100,6 +100,11 @@ BEGIN
     SET @ModuleCounter = @ModuleCounter + 1;
 END
 select * from Courses;
+select * from Modules;
+select * from Parts;
+select * from Lessons;
+select * from LessonTypes;
+select * from LessonVideos;
 select * from Users;
 select * from Roles;
 select * from UserRoles;
