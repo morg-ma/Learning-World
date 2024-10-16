@@ -1,0 +1,39 @@
+﻿@model CoursesOverviewViewModel
+
+<div class="container mt-3 d-flex flex-lg-wrap">
+    @foreach (var course in Model.Page.Items)
+    {
+        <a class="text-black text-decoration-none" asp-action="CourseDetails" asp-route-courseId="@course.CourseId">
+            <div class="card mb-3 me-2" style="width: 20rem;">
+                <img src="~/assets/Images/Courses/default.png" class="card-img-top" alt="Course Image">
+                <div class="card-body">
+                    <h5 class="card-title">@course.Title</h5>
+                    <p class="card-text">@course.Description</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <span>⭐ @course.AverageRating</span>
+                    <span class="badge bg-secondary">@course.DifficultyLevel</span>
+                </div>
+            </div>
+        </a>
+    }
+</div>
+
+<div class="col-md-12">
+    <nav>
+        <ul class="pagination justify-content-center">
+            <li class="page-item">
+                <button class="page-link" onclick="loadCourses(@Model.Page.PageNo - 1)" @(Model.Page.HasPrevPage ? "" : "disabled")>Previous</button>
+            </li>
+            @for (var i = 1; i <= Model.Page.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.Page.PageNo ? "active" : "")">
+                    <button class="page-link" onclick="loadCourses(@i)">@i</button>
+                </li>
+            }
+            <li class="page-item">
+                <button class="page-link" onclick="loadCourses(@Model.Page.PageNo + 1)" @(Model.Page.HasNextPage ? "" : "disabled")>Next</button>
+            </li>
+        </ul>
+    </nav>
+</div>
