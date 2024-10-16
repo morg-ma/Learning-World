@@ -1,0 +1,18 @@
+﻿@model Lesson
+
+
+
+
+<div class="container my-4 bg-light p-4 rounded shadow">
+    <!-- Lesson Title -->
+    <h1 class="display-6 mb-3">@Model.Title</h1>
+
+    <!-- Lesson Text Content -->
+    <div class="lesson-content">
+        <p class="lead text-justify fs-5" style="line-height: 1.8;">
+            @Model.LessonText.Content
+        </p>
+    </div>
+</div>
+
+
