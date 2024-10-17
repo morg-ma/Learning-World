@@ -5,6 +5,7 @@ using Learning_World.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Plugins;
+using NuGet.Versioning;
 
 namespace Learning_World.Controllers
 {
@@ -15,12 +16,13 @@ namespace Learning_World.Controllers
         {
             _db = _DbContext;
         }
-        public IActionResult Home(int id, int moduleNumber = 1)
+        public IActionResult Index(int id, int moduleId = 1)
         {
             var course = _db.Courses.FirstOrDefault(e => e.CourseId == id);
             ViewBag.CourseTilte = course.Title;
-            ViewBag.moduleNumber = moduleNumber;
             var modules = _db.Modules.Where(e => e.CourseId == id).ToList();
+            ViewBag.Modules = modules;
+            ViewBag.SelectedModuleId = moduleId;
             return View(modules);
         }
 
@@ -31,35 +33,46 @@ namespace Learning_World.Controllers
             return PartialView(partsWithLessons);
 
         }
+		[Route("Learn/lesson/{moduleId?}/{lessonType}/{lessonId}")]
 
-        public IActionResult LessonsPartialView(int id)
+		public IActionResult LessonsPartialView(int moduleId, int lessonId)
         {
-            var partsWithLessons = _db.Parts.Include(e => e.Lessons).ThenInclude(e => e.LessonType).Where(e => e.ModuleId == id).ToList();
-            return View(partsWithLessons);
-
-
+            var partsWithLessons = _db.Parts.Include(e => e.Lessons).ThenInclude(e => e.LessonType).Where(e => e.ModuleId == moduleId).ToList();
+			int cid = (int)_db.Modules.Include(e => e.Course).FirstOrDefault(e => e.ModuleId == moduleId).CourseId;
+			ViewBag.C_Id = cid;
+            ViewBag.ModuleName= partsWithLessons[0].Module.Title;
+			return View(partsWithLessons);
         }
 
-        public IActionResult LessonDiaplayPartialView(int id, string type)
+
+
+        [Route("Learn/LessonDisplayPartialView/{moduleId?}/{lessonType}/{lessonId}")]
+        public IActionResult LessonDisplayPartialView(int lessonId, string lessonType)
         {
-            switch (type)
+            switch (lessonType)
             {
                 case "Video":
-                    var lesson1 = _db.Lessons.Include(e => e.LessonVideo).FirstOrDefault(e => e.LessonId == id);
+                    var lesson1 = _db.Lessons.Include(e => e.LessonVideo).FirstOrDefault(e => e.LessonId == lessonId);
                     return PartialView("LessonVideoDisplay", lesson1);
+
                 case "Text":
-                    var lesson2 = _db.Lessons.Include(e => e.LessonText).FirstOrDefault(e => e.LessonId == id);
+                    var lesson2 = _db.Lessons.Include(e => e.LessonText).FirstOrDefault(e => e.LessonId == lessonId);
                     return PartialView("LessonTextDisplay", lesson2);
+
                 case "Quiz":
-                    //var lesson3 = _db.Lessons.Include(e => e.LessonQuiz).FirstOrDefault(e => e.LessonId == id);
-                    return RedirectToAction("GetQuiz", new { lessonId = id });
+                    return RedirectToAction("GetQuiz", new { lessonId = lessonId });
+
                 default:
-                    var lesson4 = _db.Lessons.Include(e => e.LessonVideo).FirstOrDefault(e => e.LessonId == id);
-                    return View("LessonVideoDisplay", lesson4);
+                    var lesson4 = _db.Lessons.Include(e => e.LessonVideo).FirstOrDefault(e => e.LessonId == lessonId);
+                    return PartialView("LessonVideoDisplay", lesson4);
             }
+
         }
 
-    
+
+
+
+
         public IActionResult GetQuiz(int lessonId)
         {
             var lesson = _db.Lessons.Include(e => e.LessonQuiz)

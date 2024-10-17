@@ -22,8 +22,35 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.UseEndpoints(endpoints =>
+{
+    // Default route
+    _ = endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+
+    // Module route for rendering the full page
+    _ = endpoints.MapControllerRoute(
+        name: "module",
+        pattern: "Learn/index/{id}/module/{moduleId}",
+        defaults: new { controller = "Learn", action = "Index" });
+
+    // Partial view route for AJAX requests (lesson content)
+    _ = endpoints.MapControllerRoute(
+        name: "modulePartial",
+        pattern: "Learn/PartsPartialView/{moduleId}",
+        defaults: new { controller = "Learn", action = "PartsPartialView" });
+
+    _ = endpoints.MapControllerRoute(
+        name: "lessonDisplayPartial",
+        pattern: "Learn/lesson/{moduleId}/{lessonType}/{lessonId}",
+        defaults: new { controller = "Learn", action = "LessonsPartialView" });
+
+    //_ = endpoints.MapControllerRoute(
+    //    name: "lessonDisplayPartial",
+    //    pattern: "Learn/LessonDisplayPartialView/{moduleId}/{lessonType}/{lessonId}",
+    //    defaults: new { controller = "Learn", action = "LessonDisplayPartialView" });
+       
+});
 
 app.Run();

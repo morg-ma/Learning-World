@@ -3,85 +3,65 @@
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
 
-
-
-
 @foreach (var part in Model)
 {
-    <div class="container mt-5">
-        <div class="accordion" id="accordion-@part.PartId">
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="heading-@part.PartId">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@part.PartId" aria-expanded="true" aria-controls="collapse-@part.PartId">
-                        @part.Title
-                    </button>
-                </h2>
-                <div id="collapse-@part.PartId" class="accordion-collapse collapse show" aria-labelledby="heading-@part.PartId" data-bs-parent="#accordion-@part.PartId">
-                    <div class="accordion-body">
-                        <ul class="list-group">
-                            @foreach (var lesson in part.Lessons)
-                            {
-                                <li class="list-group-item d-flex justify-content-start gap-2 align-items-center">
-                                    <span>
-                                        @switch (lesson.LessonType.TypeName)
-                                        {
-                                            case "Video":
-                                                <i class="bi bi-play-circle"></i>
-                                                break;
-                                            case "Text":
-                                                <i class="bi bi-book"></i>
-                                                break;
-                                            case "Quiz":
-                                                <i class="bi bi-question-circle"></i>
-                                                break;
-                                            default:
-                                                <i class="bi bi-file-earmark-text"></i> <!-- Default icon -->
-                                                break;
-                                        }
-                                    </span>
-                                    <a href="#">@lesson.Title</a>
-                                </li>
-                            }
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="container mt-5">
+		<div class="accordion" id="accordion-@part.PartId">
+			<div class="accordion-item">
+				<h2 class="accordion-header" id="heading-@part.PartId">
+					<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@part.PartId" aria-expanded="true" aria-controls="collapse-@part.PartId">
+						@part.Title
+					</button>
+				</h2>
+				<div id="collapse-@part.PartId" class="accordion-collapse collapse show" aria-labelledby="heading-@part.PartId" data-bs-parent="#accordion-@part.PartId">
+					<div class="accordion-body">
+						<ul class="list-group">
+							@foreach (var lesson in part.Lessons)
+							{
+								<li class="list-group-item d-flex justify-content-start gap-2 align-items-center">
+									<span>
+										@switch (lesson.LessonType.TypeName)
+										{
+											case "Video":
+												<i class="bi bi-play-circle"></i>
+												break;
+											case "Text":
+												<i class="bi bi-book"></i>
+												break;
+											case "Quiz":
+												<i class="bi bi-question-circle"></i>
+												break;
+											default:
+												<i class="bi bi-file-earmark-text"></i>
+												break;
+										}
+									</span>
+									@* <a asp-action="LessonsPartialView"
+							asp-route-id="@part.ModuleId"
+							asp-route-partId="@part.PartId"
+							asp-route-lessonId="@lesson.LessonId">@lesson.Title</a> *@
+									<a asp-action="LessonsPartialView"
+									   asp-route-moduleId="@part.ModuleId"
+									   asp-route-lessonType="@lesson.LessonType.TypeName"
+									   asp-route-lessonId="@lesson.LessonId">
+										@lesson.Title
+									</a>
+								</li>
+							}
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 }
-
-
-
-
-
-
-<!-- Video Item -->
-@* <li class="list-group-item d-flex justify-content-start gap-2 align-items-center">
-                                <span>
-                                    <i class="bi bi-play-circle"></i>
-                                </span>
-                                <a href="#">A day in the Life of a Database Engineer</a>
-                            </li>
-                            <!-- Quiz/Discussion Item -->
-                            <li class="list-group-item d-flex justify-content-start gap-2 align-items-center">
-                                <span>
-                                    <i class="bi bi-question-circle"></i>
-                                </span>
-                                <a href="#">What do you hope to learn?</a>
-                            </li>
-                            <!-- Reading Item -->
-                            <li class="list-group-item d-flex justify-content-start gap-2 align-items-center">
-                                <span>
-                                    <i class="bi bi-book"></i>
-                                </span>
-                                <a href="#">Course syllabus: Introduction to databases</a>
-                            </li> *@
-
 
 
 
 @section Scripts
 {
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+	@* <script src="~/js/parts.js"></script> *@
+	<script src="~/js/index.js"></script>
+	<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+	<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 }
