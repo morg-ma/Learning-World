@@ -4,7 +4,7 @@
     @foreach (var course in Model.Page.Items)
     {
         <a class="text-black text-decoration-none" asp-action="CourseDetails" asp-route-courseId="@course.CourseId">
-            <div class="card mb-3 me-2" style="width: 20rem;">
+            <div class="card mb-3 me-2" style="height: 25rem; width: 20rem;">
                 <img src="~/assets/Images/Courses/default.png" class="card-img-top" alt="Course Image">
                 <div class="card-body">
                     <h5 class="card-title">@course.Title</h5>
