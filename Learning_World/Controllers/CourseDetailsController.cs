@@ -37,10 +37,14 @@ namespace Learning_World.Controllers
                 // Save user information to the database
                 if (model.PaymentMethod == "CreditCard")
                 {
+                    //var CreditPayment = new PaymentMethod { CardName = model.CardName, CardNumber = model.CardNumber,ExpiryDate=model.ExpiryDate,CVC=model.CVC,PaymentType=model.PaymentMethod,UserID=model.UserId };
+                    //_context.PaymentMethods.Add(CreditPayment);
+                    //_context.SaveChanges();
                     // Validate and process credit card information
                 }
                 else if (model.PaymentMethod == "PayPal")
                 {
+                    //var PayPalPayment = new PaymentMethod { };
                     // Process PayPal payment
                 }
                 // Redirect to a success page or return view
@@ -49,6 +53,5 @@ namespace Learning_World.Controllers
 
             return View("Enroll");
         }
-
     }
 }
