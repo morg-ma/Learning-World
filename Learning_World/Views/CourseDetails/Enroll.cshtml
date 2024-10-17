@@ -1,0 +1,129 @@
+﻿@model UserRegistrationViewModel
+@{
+    ViewBag.Title = "Enroll in Course";
+}
+<h2>Checkout</h2>
+<div class="row">
+    <!-- Left Section: Payment Form -->
+    <div class="col-md-8">
+        <h1>Billing Address</h1>
+        <form asp-action="Enroll" method="post">
+            <input type="hidden" name="CourseId" value="@ViewBag.CourseId" />
+
+            <div class="mb-3">
+                <label asp-for="UserName" class="form-label"></label>
+                <input asp-for="UserName" class="form-control" required />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label for="Country" class="form-label">Country</label>
+                <select asp-for="Country" class="form-select" required>
+                    <option value="">Select a Country</option>
+                    <option value="US">United States</option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="CA">Canada</option>
+                    <option value="AU">Australia</option>
+                    <option value="FR">France</option>
+                    <option value="DE">Germany</option>
+                    <option value="IN">India</option>
+                    <option value="CN">China</option>
+                    <option value="JP">Japan</option>
+                    <option value="BR">Brazil</option>
+                    <option value="EG">Egypt</option>
+                </select>
+                <span asp-validation-for="Country" class="text-danger"></span>
+            </div>
+
+            <!-- Payment Method Selection -->
+            <h2>Select Payment Method</h2>
+            <div class="payment-method-cards">
+                <div class="card mb-3 payment-card" id="creditCardOption" onclick="selectPaymentMethod('CreditCard')">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <img src="~/images/card.png" alt="Credit Card Icon" class="me-2" style="width: 40px;" />
+                            <h5 class="card-title mb-0">Credit Card</h5>
+                        </div>
+                        <img src="~/images/credits.jfif" alt="Additional Icon" style="width: 150px; height: auto;" />
+                    </div>
+                </div>
+
+                <div class="card mb-3 payment-card" id="paypalOption" onclick="selectPaymentMethod('PayPal')">
+                    <div class="card-body d-flex align-items-center">
+                        <img src="~/images/PayPal.png" alt="PayPal Icon" class="me-2" style="width: 40px;" />
+                        <h5 class="card-title mb-0">PayPal</h5>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Fields -->
+            <div id="paymentFieldsContainer">
+                <!-- Credit Card Fields -->
+                <div id="creditCardFields" style="display: none;">
+                    <div class="mb-3">
+                        <label for="CardName" class="form-label">Name on Card</label>
+                        <input type="text" id="CardName" class="form-control" name="CardName" />
+                        <span asp-validation-for="CardName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="CardNumber" class="form-label">Card Number</label>
+                        <input type="text" id="CardNumber" class="form-control" name="CardNumber" />
+                        <span asp-validation-for="CardNumber" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ExpiryDate" class="form-label">Expiry Date (MM/YY)</label>
+                        <input type="text" id="ExpiryDate" class="form-control" name="ExpiryDate" placeholder="MM/YY" />
+                        <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="CVC" class="form-label">CVC/CVV</label>
+                        <input type="text" id="CVC" class="form-control" name="CVC" />
+                        <span asp-validation-for="CVC" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- PayPal Fields -->
+                <div id="paypalFields" style="display: none;">
+                    <div class="mb-3">
+                        <label for="PayPalEmail" class="form-label">PayPal Email</label>
+                        <input type="email" id="PayPalEmail" class="form-control" name="PayPalEmail" />
+                        <span asp-validation-for="PayPalEmail" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Enroll Now</button>
+        </form>
+    </div>
+
+    <!-- Right Section: Course Summary -->
+    <div class="col-md-4">
+        <h2>Summary</h2>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">@ViewBag.CourseName Course Name</h5>
+                <p class="card-text">Price: $@ViewBag.CoursePrice</p>
+                <!-- You can add more course details here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        function selectPaymentMethod(paymentMethod) {
+            const creditCardFields = document.getElementById("creditCardFields");
+            const paypalFields = document.getElementById("paypalFields");
+
+            creditCardFields.style.display = "none";
+            paypalFields.style.display = "none";
+
+            if (paymentMethod === "CreditCard") {
+                creditCardFields.style.display = "block";
+            } else if (paymentMethod === "PayPal") {
+                paypalFields.style.display = "block";
+            }
+        }
+    </script>
+}
