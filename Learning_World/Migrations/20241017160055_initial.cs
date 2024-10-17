@@ -30,6 +30,7 @@ namespace Learning_World.Migrations
                 {
                     CourseID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Description = table.Column<string>(type: "ntext", nullable: true),
                     DifficultyLevel = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
@@ -55,6 +56,25 @@ namespace Learning_World.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK__LessonTy__D7FA802EA01B0CE9", x => x.LessonTypeID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PaymentMethods",
+                columns: table => new
+                {
+                    PaymentMethodID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserID = table.Column<int>(type: "int", nullable: false),
+                    PaymentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CardName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CardNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExpiryDate = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CVC = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PayPalEmail = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaymentMethods", x => x.PaymentMethodID);
                 });
 
             migrationBuilder.CreateTable(
@@ -576,6 +596,9 @@ namespace Learning_World.Migrations
 
             migrationBuilder.DropTable(
                 name: "LessonVideos");
+
+            migrationBuilder.DropTable(
+                name: "PaymentMethods");
 
             migrationBuilder.DropTable(
                 name: "Progresses");

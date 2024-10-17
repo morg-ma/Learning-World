@@ -6,7 +6,7 @@ namespace Learning_World.Models;
 public partial class Course
 {
     public int CourseId { get; set; }
-
+    public decimal Price { get; set; } // Add Price property
     public string Title { get; set; } = null!;
 
     public string? Description { get; set; }

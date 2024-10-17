@@ -181,6 +181,9 @@ namespace Learning_World.Migrations
                     b.Property<int?>("MaxEnrollment")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("PublicationStatus")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -404,6 +407,41 @@ namespace Learning_World.Migrations
                     b.HasIndex("ModuleId");
 
                     b.ToTable("Parts");
+                });
+
+            modelBuilder.Entity("Learning_World.Models.PaymentMethod", b =>
+                {
+                    b.Property<int>("PaymentMethodID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentMethodID"));
+
+                    b.Property<string>("CVC")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CardName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CardNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ExpiryDate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PayPalEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserID")
+                        .HasColumnType("int");
+
+                    b.HasKey("PaymentMethodID");
+
+                    b.ToTable("PaymentMethods");
                 });
 
             modelBuilder.Entity("Learning_World.Models.Progress", b =>
