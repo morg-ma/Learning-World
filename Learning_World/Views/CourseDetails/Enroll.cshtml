@@ -8,7 +8,10 @@
     <div class="col-md-8">
         <h1>Billing Address</h1>
         <form asp-action="Enroll" method="post">
-            <input type="hidden" name="CourseId" value="@ViewBag.CourseId" />
+            <input type="hidden" asp-for="CourseId" />
+            <input type="hidden" asp-for="CourseName" />
+            <input type="hidden" asp-for="CoursePrice" />
+            <input type="hidden" asp-for="UserId" />
 
             <div class="mb-3">
                 <label asp-for="UserName" class="form-label"></label>
@@ -35,9 +38,10 @@
             </div>
 
             <!-- Payment Method Selection -->
-            <h2>Select Payment Method</h2>
+            @* <h2>Select Payment Method</h2> *@
+            <h2> Payment Method Details </h2>
             <div class="payment-method-cards">
-                <div class="card mb-3 payment-card" id="creditCardOption" onclick="selectPaymentMethod('CreditCard')">
+                <div class="card mb-3 payment-card" id="creditCardOption" onclick="selectPaymentMethod()">
                     <div class="card-body d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center">
                             <img src="~/images/card.png" alt="Credit Card Icon" class="me-2" style="width: 40px;" />
@@ -47,12 +51,12 @@
                     </div>
                 </div>
 
-                <div class="card mb-3 payment-card" id="paypalOption" onclick="selectPaymentMethod('PayPal')">
+                @* <div class="card mb-3 payment-card" id="paypalOption" onclick="selectPaymentMethod('PayPal')">
                     <div class="card-body d-flex align-items-center">
                         <img src="~/images/PayPal.png" alt="PayPal Icon" class="me-2" style="width: 40px;" />
                         <h5 class="card-title mb-0">PayPal</h5>
                     </div>
-                </div>
+                </div> *@
             </div>
 
             <!-- Payment Fields -->
@@ -60,37 +64,36 @@
                 <!-- Credit Card Fields -->
                 <div id="creditCardFields" style="display: none;">
                     <div class="mb-3">
-                        <label for="CardName" class="form-label">Name on Card</label>
-                        <input type="text" id="CardName" class="form-control" name="CardName" />
+                        <label asp-for="CardName" class="form-label">Name on Card</label>
+                        <input type="text" id="CardName" class="form-control" asp-for="CardName" />
                         <span asp-validation-for="CardName" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
-                        <label for="CardNumber" class="form-label">Card Number</label>
-                        <input type="text" id="CardNumber" class="form-control" name="CardNumber" />
+                        <label asp-for="CardNumber" class="form-label">Card Number</label>
+                        <input type="text" id="CardNumber" class="form-control" asp-for="CardNumber" />
                         <span asp-validation-for="CardNumber" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
-                        <label for="ExpiryDate" class="form-label">Expiry Date (MM/YY)</label>
-                        <input type="text" id="ExpiryDate" class="form-control" name="ExpiryDate" placeholder="MM/YY" />
+                        <label asp-for="ExpiryDate" class="form-label">Expiry Date (MM/YY)</label>
+                        <input type="text" id="ExpiryDate" class="form-control" asp-for="ExpiryDate" placeholder="MM/YY" />
                         <span asp-validation-for="ExpiryDate" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
-                        <label for="CVC" class="form-label">CVC/CVV</label>
-                        <input type="text" id="CVC" class="form-control" name="CVC" />
+                        <label asp-for="CVC" class="form-label">CVC/CVV</label>
+                        <input type="text" id="CVC" class="form-control" asp-for="CVC" />
                         <span asp-validation-for="CVC" class="text-danger"></span>
                     </div>
                 </div>
-
-                <!-- PayPal Fields -->
+            @*  <!-- PayPal Fields -->
                 <div id="paypalFields" style="display: none;">
                     <div class="mb-3">
                         <label for="PayPalEmail" class="form-label">PayPal Email</label>
                         <input type="email" id="PayPalEmail" class="form-control" name="PayPalEmail" />
                         <span asp-validation-for="PayPalEmail" class="text-danger"></span>
                     </div>
-                </div>
+                </div> *@
             </div>
-            <button type="submit" class="btn btn-primary">Enroll Now</button>
+            <button type="submit" class="btn btn-primary mb-5">Enroll Now</button>
         </form>
     </div>
 
@@ -99,8 +102,8 @@
         <h2>Summary</h2>
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">@ViewBag.CourseName Course Name</h5>
-                <p class="card-text">Price: $@ViewBag.CoursePrice</p>
+                <h5 class="card-title">Course Name: @Model.CourseName</h5>
+                <p class="card-text">Price: $@Model.CoursePrice</p>
                 <!-- You can add more course details here -->
             </div>
         </div>
@@ -112,18 +115,22 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
-        function selectPaymentMethod(paymentMethod) {
+        document.getElementById("creditCardFields").style.display = "none";
+
+        function selectPaymentMethod() {
             const creditCardFields = document.getElementById("creditCardFields");
-            const paypalFields = document.getElementById("paypalFields");
+            // const paypalFields = document.getElementById("paypalFields");
 
-            creditCardFields.style.display = "none";
-            paypalFields.style.display = "none";
+            // creditCardFields.style.display = "none";
+            // paypalFields.style.display = "none";
 
-            if (paymentMethod === "CreditCard") {
-                creditCardFields.style.display = "block";
-            } else if (paymentMethod === "PayPal") {
-                paypalFields.style.display = "block";
-            }
+            creditCardFields.style.display = "block";
+            // if (paymentMethod === "CreditCard") {
+            //     creditCardFields.style.display = "block";
+            // } 
+            // else if (paymentMethod === "PayPal") {
+            //     paypalFields.style.display = "block";
+            // }
         }
     </script>
 }

@@ -15,7 +15,7 @@ public partial class ElearningPlatformContext : DbContext
         : base(options)
     {
     }
-    public virtual DbSet<PaymentMethod> PaymentMethods { get; set; }
+    public virtual DbSet<Payment> Payments { get; set; }
 
 
     public virtual DbSet<AdminLog> AdminLogs { get; set; }

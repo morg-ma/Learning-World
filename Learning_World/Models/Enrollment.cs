@@ -11,13 +11,13 @@ public partial class Enrollment
     public int? UserId { get; set; }
 
     public int? CourseId { get; set; }
-    [ForeignKey(nameof(PaymentMethod))]
-    public int PaymentMethodID { get; set; }
+    [ForeignKey(nameof(Payment))]
+    public int PaymentID { get; set; }
 
     public DateTime EnrollmentDate { get; set; }
 
     public virtual Course? Course { get; set; }
 
     public virtual User? User { get; set; }
-    public PaymentMethod PaymentMethod { get; set; }
+    public Payment Payment { get; set; }
 }

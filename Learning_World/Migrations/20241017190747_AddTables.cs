@@ -60,22 +60,20 @@ namespace Learning_World.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PaymentMethods",
+                name: "Payments",
                 columns: table => new
                 {
-                    PaymentMethodID = table.Column<int>(type: "int", nullable: false)
+                    PaymentID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PaymentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CardName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CardNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ExpiryDate = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CVC = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PayPalEmail = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    CVC = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PaymentMethods", x => x.PaymentMethodID);
+                    table.PrimaryKey("PK_Payments", x => x.PaymentID);
                 });
 
             migrationBuilder.CreateTable(
@@ -226,17 +224,17 @@ namespace Learning_World.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserID = table.Column<int>(type: "int", nullable: true),
                     CourseID = table.Column<int>(type: "int", nullable: true),
-                    PaymentMethodID = table.Column<int>(type: "int", nullable: false),
+                    PaymentID = table.Column<int>(type: "int", nullable: false),
                     EnrollmentDate = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "(getdate())")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK__Enrollme__7F6877FBD79853B5", x => x.EnrollmentID);
                     table.ForeignKey(
-                        name: "FK_Enrollments_PaymentMethods_PaymentMethodID",
-                        column: x => x.PaymentMethodID,
-                        principalTable: "PaymentMethods",
-                        principalColumn: "PaymentMethodID",
+                        name: "FK_Enrollments_Payments_PaymentID",
+                        column: x => x.PaymentID,
+                        principalTable: "Payments",
+                        principalColumn: "PaymentID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK__Enrollmen__Cours__59063A47",
@@ -501,9 +499,10 @@ namespace Learning_World.Migrations
                 column: "CourseID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Enrollments_PaymentMethodID",
+                name: "IX_Enrollments_PaymentID",
                 table: "Enrollments",
-                column: "PaymentMethodID");
+                column: "PaymentID",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Enrollments_UserID",
@@ -626,7 +625,7 @@ namespace Learning_World.Migrations
                 name: "Categories");
 
             migrationBuilder.DropTable(
-                name: "PaymentMethods");
+                name: "Payments");
 
             migrationBuilder.DropTable(
                 name: "QuizQuestions");

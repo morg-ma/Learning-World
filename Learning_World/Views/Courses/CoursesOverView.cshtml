@@ -69,6 +69,25 @@
 </div>
 
 
+<div class="col-md-12">
+    <nav>
+        <ul class="pagination justify-content-center">
+            <li class="page-item">
+                <button class="page-link" onclick="loadCourses(@Model.Page.PageNo - 1)" @(Model.Page.HasPrevPage ? "" : "disabled")>Previous</button>
+            </li>
+            @for (var i = 1; i <= Model.Page.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.Page.PageNo ? "active" : "")">
+                    <button class="page-link" onclick="loadCourses(@i)">@i</button>
+                </li>
+            }
+            <li class="page-item">
+                <button class="page-link" onclick="loadCourses(@Model.Page.PageNo + 1)" @(Model.Page.HasNextPage ? "" : "disabled")>Next</button>
+            </li>
+        </ul>
+    </nav>
+</div>
+
 @section Scripts {
     <script>
         function loadCourses(pageNo = 1) {

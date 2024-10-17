@@ -12,22 +12,33 @@ namespace Learning_World.Controllers
         {
             _context = elearningPlatform;
         }
-        public IActionResult ShowCourse(int id = 1)
+        public IActionResult ShowCourse(int courseId = 1, int userId = 1)
         {
-            Course course = _context.Courses.Include(e => e.Users).FirstOrDefault(e => e.CourseId == id);
+            Course course = _context.Courses.Include(e => e.Users).FirstOrDefault(e => e.CourseId == courseId);
             if (course == null)
             {
                 return NotFound();
             }
-            ViewBag.modules = _context.Modules.Where(e => e.CourseId == id).ToList();
+            ViewBag.modules = _context.Modules.Where(e => e.CourseId == courseId).ToList();
             ViewBag.parts = _context.Parts.ToList();
             ViewBag.lessons = _context.Lessons.ToList();
+            ViewBag.UserId = userId;
             return View(course);
         }
-        public IActionResult Enroll(int courseId)
+        public IActionResult Enroll(int courseId, int userId)
         {
-            ViewBag.CourseId = courseId; // Pass the course ID to the view
-            return View();
+            //ViewBag.CourseId = courseId; // Pass the course ID to the view
+            var course = _context.Courses.FirstOrDefault(c => c.CourseId == courseId);
+            if (course == null)
+                return NotFound();
+
+            var userRegistration = new UserRegistrationViewModel();
+            userRegistration.CourseId = course.CourseId;
+            userRegistration.CourseName = course.Title;
+            userRegistration.CoursePrice = course.Price;
+            userRegistration.UserId = userId;
+
+            return View(userRegistration);
         }
         [HttpPost]
         public IActionResult Enroll(UserRegistrationViewModel model)
@@ -35,23 +46,43 @@ namespace Learning_World.Controllers
             if (ModelState.IsValid)
             {
                 // Save user information to the database
-                if (model.PaymentMethod == "CreditCard")
-                {
-                    //var CreditPayment = new PaymentMethod { CardName = model.CardName, CardNumber = model.CardNumber,ExpiryDate=model.ExpiryDate,CVC=model.CVC,PaymentType=model.PaymentMethod,UserID=model.UserId };
-                    //_context.PaymentMethods.Add(CreditPayment);
-                    //_context.SaveChanges();
-                    // Validate and process credit card information
-                }
-                else if (model.PaymentMethod == "PayPal")
-                {
-                    //var PayPalPayment = new PaymentMethod { };
-                    // Process PayPal payment
-                }
-                // Redirect to a success page or return view
-                return RedirectToAction("new view");
-            }
+                //if (model.PaymentMethod == "CreditCard")
+                //{
 
-            return View("Enroll");
+                var CreditPayment = new Payment { 
+                    CardName = model.CardName, 
+                    CardNumber = model.CardNumber, 
+                    ExpiryDate = model.ExpiryDate, 
+                    CVC = model.CVC, 
+                    Country = model.Country
+                };
+
+                var enrollment = new Enrollment
+                {
+                    CourseId = model.CourseId,
+                    UserId = model.UserId,
+                    EnrollmentDate = DateTime.UtcNow,
+                    PaymentID = CreditPayment.PaymentID
+                };
+
+                _context.Payments.Add(CreditPayment);
+                _context.Enrollments.Add(enrollment);
+                _context.SaveChanges();
+
+
+                // Validate and process credit card information
+                //}
+                //else if (model.PaymentMethod == "PayPal")
+                //{
+                //    //var PayPalPayment = new PaymentMethod { };
+                //    // Process PayPal payment
+                //}
+                // Redirect to a success page or return view
+                return RedirectToAction("Index", "MyLearning", new { userId = model.UserId });
+                // return RedirectToAction("CourseView", new {courseId = model.Course.CourseId, userId = model.UserId});
+            }
+            
+            return View("Enroll", model);
         }
     }
 }
