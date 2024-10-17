@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Learning_World.Migrations
 {
     [DbContext(typeof(ElearningPlatformContext))]
-    [Migration("20241017172121_paymentmethodtable")]
-    partial class paymentmethodtable
+    [Migration("20241017175102_AddTables")]
+    partial class AddTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -176,6 +176,9 @@ namespace Learning_World.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("LastUpdateDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
@@ -221,6 +224,9 @@ namespace Learning_World.Migrations
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("(getdate())");
 
+                    b.Property<int>("PaymentMethodID")
+                        .HasColumnType("int");
+
                     b.Property<int?>("UserId")
                         .HasColumnType("int")
                         .HasColumnName("UserID");
@@ -229,6 +235,8 @@ namespace Learning_World.Migrations
                         .HasName("PK__Enrollme__7F6877FBD79853B5");
 
                     b.HasIndex("CourseId");
+
+                    b.HasIndex("PaymentMethodID");
 
                     b.HasIndex("UserId");
 
@@ -442,9 +450,6 @@ namespace Learning_World.Migrations
                     b.Property<string>("PaymentType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
 
                     b.HasKey("PaymentMethodID");
 
@@ -722,12 +727,20 @@ namespace Learning_World.Migrations
                         .HasForeignKey("CourseId")
                         .HasConstraintName("FK__Enrollmen__Cours__59063A47");
 
+                    b.HasOne("Learning_World.Models.PaymentMethod", "PaymentMethod")
+                        .WithMany()
+                        .HasForeignKey("PaymentMethodID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Learning_World.Models.User", "User")
                         .WithMany("Enrollments")
                         .HasForeignKey("UserId")
                         .HasConstraintName("FK__Enrollmen__UserI__5812160E");
 
                     b.Navigation("Course");
+
+                    b.Navigation("PaymentMethod");
 
                     b.Navigation("User");
                 });

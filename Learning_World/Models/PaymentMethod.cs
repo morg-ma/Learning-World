@@ -6,7 +6,6 @@ namespace Learning_World.Models
     {
         [Key]
         public int PaymentMethodID { get; set; }
-        public int UserID { get; set; }
         public string Country { get; set; } 
         public string PaymentType { get; set; } // 'CreditCard', 'PayPal', etc.
         public string? CardName { get; set; } // Nullable for PayPal

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Learning_World.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class AddTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,10 +30,11 @@ namespace Learning_World.Migrations
                 {
                     CourseID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Description = table.Column<string>(type: "ntext", nullable: true),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DifficultyLevel = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "(getdate())"),
                     LastUpdateDate = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "(getdate())"),
                     PublicationStatus = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
@@ -64,7 +65,7 @@ namespace Learning_World.Migrations
                 {
                     PaymentMethodID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserID = table.Column<int>(type: "int", nullable: false),
+                    Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PaymentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CardName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CardNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -225,11 +226,18 @@ namespace Learning_World.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserID = table.Column<int>(type: "int", nullable: true),
                     CourseID = table.Column<int>(type: "int", nullable: true),
+                    PaymentMethodID = table.Column<int>(type: "int", nullable: false),
                     EnrollmentDate = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "(getdate())")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK__Enrollme__7F6877FBD79853B5", x => x.EnrollmentID);
+                    table.ForeignKey(
+                        name: "FK_Enrollments_PaymentMethods_PaymentMethodID",
+                        column: x => x.PaymentMethodID,
+                        principalTable: "PaymentMethods",
+                        principalColumn: "PaymentMethodID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK__Enrollmen__Cours__59063A47",
                         column: x => x.CourseID,
@@ -493,6 +501,11 @@ namespace Learning_World.Migrations
                 column: "CourseID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Enrollments_PaymentMethodID",
+                table: "Enrollments",
+                column: "PaymentMethodID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Enrollments_UserID",
                 table: "Enrollments",
                 column: "UserID");
@@ -598,9 +611,6 @@ namespace Learning_World.Migrations
                 name: "LessonVideos");
 
             migrationBuilder.DropTable(
-                name: "PaymentMethods");
-
-            migrationBuilder.DropTable(
                 name: "Progresses");
 
             migrationBuilder.DropTable(
@@ -614,6 +624,9 @@ namespace Learning_World.Migrations
 
             migrationBuilder.DropTable(
                 name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "PaymentMethods");
 
             migrationBuilder.DropTable(
                 name: "QuizQuestions");
