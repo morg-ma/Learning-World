@@ -43,16 +43,11 @@ namespace Learning_World.Controllers
                 {
                     // Process PayPal payment
                 }
-                else if (model.PaymentMethod == "BankTransfer")
-                {
-                    // Process bank transfer
-                }
-
                 // Redirect to a success page or return view
-                return RedirectToAction("Index");
+                return RedirectToAction("new view");
             }
 
-            return View(model);
+            return View("Enroll");
         }
 
     }
