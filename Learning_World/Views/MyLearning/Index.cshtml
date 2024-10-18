@@ -1,0 +1,36 @@
+﻿@model List<MyLearningCoursesViewModel>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1 class="mb-4">My Learning</h1>
+
+<div class="btn-group mb-5" role="group">
+    <button id="InProgressBtn" class="btn btn-outline-primary" onclick="filterCourses('InProgress')">In Progress</button>
+    <button id="CompletedBtn" class="btn btn-outline-primary" onclick="filterCourses('Completed')">Completed</button>
+</div>
+
+<div id="courseList" class="container">
+    <partial name="_MyLearningCoursesPartial">
+</div>
+
+@section Scripts{
+    <script>
+        function filterCourses(filter) {
+            // reset all buttons
+            $('.btn-group .btn').removeClass('btn-primary').addClass('btn-outline-primary');
+
+            // active clicked button
+            $('#' + filter + 'Btn').removeClass('btn-outline-primary').addClass('btn-primary');
+
+            // ajax call
+            $.ajax({
+                url: "/MyLearning/" + filter + "Courses" + "?userId=" + @ViewBag.UserId,
+                success: function (response) {
+                    // The filtered courses
+                    $('#courseList').html(response);
+                }
+            });
+        }
+    </script>
+}

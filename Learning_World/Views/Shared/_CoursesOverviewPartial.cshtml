@@ -1,0 +1,20 @@
+﻿@model CoursesOverviewViewModel
+
+<div class="container mt-3 d-flex flex-lg-wrap">
+    @foreach (var course in Model.Page.Items)
+    {
+        <a class="text-black text-decoration-none" asp-controller="CourseDetails" asp-action="ShowCourse" asp-route-courseId="@course.CourseId" asp-route-userId="1">
+            <div class="card mb-3 me-2" style="height: 25rem; width: 20rem;">
+                <img src="~/assets/Images/Courses/default.png" class="card-img-top" alt="Course Image">
+                <div class="card-body">
+                    <h5 class="card-title">@course.Title</h5>
+                    <p class="card-text">@course.Description</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <span>⭐ @course.AverageRating</span>
+                    <span class="badge bg-secondary">@course.DifficultyLevel</span>
+                </div>
+            </div>
+        </a>
+    }
+</div>
