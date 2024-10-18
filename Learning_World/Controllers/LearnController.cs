@@ -24,6 +24,7 @@ namespace Learning_World.Controllers
             ViewBag.Modules = modules;
             ViewBag.SelectedModuleId = moduleId;
             return View(modules);
+
         }
 
 
@@ -33,15 +34,16 @@ namespace Learning_World.Controllers
             return PartialView(partsWithLessons);
 
         }
-		[Route("Learn/lesson/{moduleId?}/{lessonType}/{lessonId}")]
+        [Route("Learn/lesson/{moduleId?}/{lessonType}/{lessonId}")]
 
-		public IActionResult LessonsPartialView(int moduleId, int lessonId)
+        public IActionResult Lessons(int moduleId, int lessonId)
         {
             var partsWithLessons = _db.Parts.Include(e => e.Lessons).ThenInclude(e => e.LessonType).Where(e => e.ModuleId == moduleId).ToList();
-			int cid = (int)_db.Modules.Include(e => e.Course).FirstOrDefault(e => e.ModuleId == moduleId).CourseId;
-			ViewBag.C_Id = cid;
-            ViewBag.ModuleName= partsWithLessons[0].Module.Title;
-			return View(partsWithLessons);
+            int cid = (int)_db.Modules.Include(e => e.Course).FirstOrDefault(e => e.ModuleId == moduleId).CourseId;
+            ViewBag.C_Id = cid;
+            ViewBag.isCompleted = _db.LessonCompletions.Where(e=>e.ModuleId == moduleId).ToList();
+			ViewBag.ModuleName = partsWithLessons[0].Module.Title;
+            return View(partsWithLessons);
         }
 
 
@@ -70,6 +72,12 @@ namespace Learning_World.Controllers
         }
 
 
+        [Route("Learn/CompleteLesson/{ModuleId}/{LessonId}/{UserId}")]
+        public void CompleteLesson(int lessonId, int UserId, int ModuleId)
+        {
+            _db.LessonCompletions.Add(new LessonCompletion (){LessonID = lessonId, UserId = UserId, ModuleId=ModuleId });
+            _db.SaveChanges();
+        }
 
 
 

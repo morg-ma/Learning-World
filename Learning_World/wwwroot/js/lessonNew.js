@@ -6,7 +6,7 @@
     const partTitles = document.querySelectorAll('.part-title');
     const contentDiv1 = document.getElementById('main');
 
-    function loadContent(url, viewName, content, scriptPath, pushState = true) {
+    function loadContent(url, viewName, content, pushState = true) {
         if (pushState) {
             // Push state to history only when navigating, not during popstate
             history.pushState({ url, viewName, scriptPath }, '', url);
@@ -30,6 +30,7 @@
         sidebar.classList.toggle('collapsed');
         menuText.textContent = sidebar.classList.contains('collapsed') ? 'Show menu' : 'Hide menu';
     });
+ 
 
     // Handle lesson item clicks
     lessonItems.forEach(item => {
@@ -40,13 +41,30 @@
     });
 
     // Handle part title clicks to expand/collapse
+    //partTitles.forEach(title => {
+    //    title.addEventListener('click', function () {
+    //        const icon = this.querySelector('i');
+    //        icon.classList.toggle('bi-chevron-right');
+    //        icon.classList.toggle('bi-chevron-down');
+    //    });
+    //});
     partTitles.forEach(title => {
         title.addEventListener('click', function () {
             const icon = this.querySelector('i');
-            icon.classList.toggle('bi-chevron-right');
-            icon.classList.toggle('bi-chevron-down');
+            const target = document.querySelector(this.getAttribute('data-bs-target'));
+
+            if (target.classList.contains('show')) {
+                icon.classList.remove('bi-chevron-down');
+                icon.classList.add('bi-chevron-right');
+            } else {
+                icon.classList.remove('bi-chevron-right');
+                icon.classList.add('bi-chevron-down');
+            }
         });
     });
+
+
+
 
     // Set active lesson
     function setActive(element) {
@@ -66,10 +84,21 @@
         loadContent(
             `/Learn/lesson/${moduleId}/${lessonType}/${lessonId}`,
             `/Learn/LessonDisplayPartialView/${moduleId}/${lessonType}/${lessonId}`,
-            contentDiv1,
-            '/js/lessons.js'
+            contentDiv1
         );
     }
+
+    document.getElementById("mark-btn").onclick = function () {
+
+        myFunction(this);
+    };
+
+    function myFunction(element) {
+        const spanText = document.getElementById("completed-span") 
+        spanText.innerText = "Completed";
+        element.innerText = "Go to next";
+    }
+
 
     // Load the initial content when the page loads
     function loadInitialContent() {
@@ -93,7 +122,6 @@
                     `/Learn/lesson/${moduleId}/${lessonType}/${lessonId}`,
                     `/Learn/LessonDisplayPartialView/${moduleId}/${lessonType}/${lessonId}`,
                     contentDiv1,
-                    '/js/lessons.js',
                     false  // Don't push state on initial load
                 );
             }

@@ -97,7 +97,14 @@
 							<a class="list-group-item lesson-item" href=""
 							   data-lesson-id="@lesson.LessonId" data-lesson-type="@lesson.LessonType.TypeName"
 							   data-module-id="@part.ModuleId">
-								<i class="bi @GetLessonIcon(lesson.LessonType.TypeName) lesson-icon"></i>
+								@if (((List<LessonCompletion>)(ViewBag.isCompleted)).Exists(e => e.LessonID == lesson.LessonId && e.UserId == 1))
+								{
+									<i class="bi bi-check lesson-icon"></i>
+								}
+								else
+								{
+								<i class="bi @GetLessonIcon(lesson.LessonType.TypeName) lesson-icon"></i>	
+								}
 								<span class="lesson-title">@lesson.Title</span>
 							</a>
 						}
@@ -113,8 +120,21 @@
 		<div id="main" >
 			<!-- Lesson content will be loaded here -->
 		</div>
+		<button id="mark-btn" class="btn btn-primary">mark as comlpleted</button>
+		<span id="completed-span"></span>
 	</div>
 </div>
+
+
+<div class="part-title" data-bs-toggle="collapse" data-bs-target="#collapseExample">
+	<i class="bi bi-chevron-right"></i> Part 1
+</div>
+<div class="collapse" id="collapseExample">
+	<div class="list-group-item">Lesson 1</div>
+	<div class="list-group-item">Lesson 2</div>
+</div>
+
+
 
 @functions {
 	string GetLessonIcon(string lessonType)
@@ -134,5 +154,10 @@
 @section Scripts {
 
 	<script src="~/js/lessonNew.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+
+	
+
 
 }

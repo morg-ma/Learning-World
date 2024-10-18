@@ -36,11 +36,7 @@
 												break;
 										}
 									</span>
-									@* <a asp-action="LessonsPartialView"
-							asp-route-id="@part.ModuleId"
-							asp-route-partId="@part.PartId"
-							asp-route-lessonId="@lesson.LessonId">@lesson.Title</a> *@
-									<a asp-action="LessonsPartialView"
+									<a asp-action="Lessons"
 									   asp-route-moduleId="@part.ModuleId"
 									   asp-route-lessonType="@lesson.LessonType.TypeName"
 									   asp-route-lessonId="@lesson.LessonId">
