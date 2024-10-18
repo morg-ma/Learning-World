@@ -11,6 +11,7 @@ builder.Services.AddDbContext<ElearningPlatformContext>(
                 options => options.UseSqlServer(builder.Configuration.GetConnectionString("connectionString")));
 var app = builder.Build();
 
+app.UseStaticFiles();// to files
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -24,6 +25,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=CourseDetails}/{action=ShowCourse}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
