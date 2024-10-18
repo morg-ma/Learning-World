@@ -6,6 +6,8 @@
     const partTitles = document.querySelectorAll('.part-title');
     const contentDiv1 = document.getElementById('main');
 
+
+    // just push the url in the browser and excute the viewname
     function loadContent(url, viewName, content, scriptPath, pushState = true) {
         if (pushState) {
             // Push state to history only when navigating, not during popstate
@@ -56,7 +58,7 @@
         }
     }
 
-    // Select and load a lesson
+    // Select and load a lesson when click
     function selectLesson(element) {
         const lessonId = element.dataset.lessonId;
         const lessonType = element.dataset.lessonType;
@@ -65,13 +67,13 @@
         setActive(element);
         loadContent(
             `/Learn/lesson/${moduleId}/${lessonType}/${lessonId}`,
-            `/Learn/LessonDisplayPartialView/${moduleId}/${lessonType}/${lessonId}`,
+            `/Learn/LessonDisplayPartialView/${lessonType}/${lessonId}`,
             contentDiv1,
             '/js/lessons.js'
         );
     }
 
-    // Load the initial content when the page loads
+    // Load the initial content when the page loads (not clicked on button)
     function loadInitialContent() {
         const urlSegments = window.location.pathname.split('/');
         const moduleId = urlSegments[3];
@@ -91,17 +93,17 @@
                 setActive(selectedLesson);
                 loadContent(
                     `/Learn/lesson/${moduleId}/${lessonType}/${lessonId}`,
-                    `/Learn/LessonDisplayPartialView/${moduleId}/${lessonType}/${lessonId}`,
+                    `/Learn/LessonDisplayPartialView/${lessonType}/${lessonId}`,
                     contentDiv1,
                     '/js/lessons.js',
                     false  // Don't push state on initial load
                 );
             }
         } else {
-            const firstLesson = document.querySelector('.lesson-item');
-            if (firstLesson) {
-                selectLesson(firstLesson);
-            }
+            //const firstLesson = document.querySelector('.lesson-item');
+            //if (firstLesson) {
+            //    selectLesson(firstLesson);
+            //}
         }
     }
 

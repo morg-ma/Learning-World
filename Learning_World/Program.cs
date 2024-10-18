@@ -40,17 +40,17 @@ app.UseEndpoints(endpoints =>
         name: "modulePartial",
         pattern: "Learn/PartsPartialView/{moduleId}",
         defaults: new { controller = "Learn", action = "PartsPartialView" });
-
-    _ = endpoints.MapControllerRoute(
-        name: "lessonDisplayPartial",
-        pattern: "Learn/lesson/{moduleId}/{lessonType}/{lessonId}",
-        defaults: new { controller = "Learn", action = "LessonsPartialView" });
+    // allow the default and the routing  -> convention based
+    //_ = endpoints.MapControllerRoute(
+    //    name: "LessonsPartialView",
+    //    pattern: "Learn/lesson/{moduleId}/{lessonType}/{lessonId}",
+    //    defaults: new { controller = "Learn", action = "LessonsPartialView" });
 
     //_ = endpoints.MapControllerRoute(
     //    name: "lessonDisplayPartial",
     //    pattern: "Learn/LessonDisplayPartialView/{moduleId}/{lessonType}/{lessonId}",
     //    defaults: new { controller = "Learn", action = "LessonDisplayPartialView" });
-       
+
 });
 
 app.Run();

@@ -33,9 +33,9 @@ namespace Learning_World.Controllers
             return PartialView(partsWithLessons);
 
         }
-		[Route("Learn/lesson/{moduleId?}/{lessonType}/{lessonId}")]
+		[Route("Learn/lesson/{moduleId}/{lessonType}/{lessonId}")]
 
-		public IActionResult LessonsPartialView(int moduleId, int lessonId)
+        public IActionResult LessonsPartialView(int moduleId, int lessonId)
         {
             var partsWithLessons = _db.Parts.Include(e => e.Lessons).ThenInclude(e => e.LessonType).Where(e => e.ModuleId == moduleId).ToList();
 			int cid = (int)_db.Modules.Include(e => e.Course).FirstOrDefault(e => e.ModuleId == moduleId).CourseId;
@@ -45,8 +45,8 @@ namespace Learning_World.Controllers
         }
 
 
-
-        [Route("Learn/LessonDisplayPartialView/{moduleId?}/{lessonType}/{lessonId}")]
+        // dont allow the default routing just the attribute routing you set 
+        [Route("Learn/LessonDisplayPartialView/{lessonType}/{lessonId}")]
         public IActionResult LessonDisplayPartialView(int lessonId, string lessonType)
         {
             switch (lessonType)

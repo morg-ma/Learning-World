@@ -1,26 +1,4 @@
-﻿//function parts(id, lessonId,lessontype) {
-//    fetch(`/Learn/lesson/${id}/${lessontype}/${lessonId}`)
-//        .then(response => response.text())
-//        .then(html => {
-//            // Insert the parts HTML into the main body
-//            document.getElementById('main-body').innerHTML = html;
-
-//            // After the parts have been loaded, initialize the lessons
-//            window.initializeLesson();
-
-//            // Automatically select and open the lesson after loading the parts
-//            const selectedLesson = document.querySelector(`.lesson-item[data-lesson-id="${lessonId}"]`);
-//            if (selectedLesson) {
-//                selectedLesson.click(); // Simulate a click on the lesson to load it
-//            }
-
-//        })
-//        .catch(error => console.error('Error loading lesson:', error));
-//}
-
-
-
-document.addEventListener("DOMContentLoaded", function () {
+﻿document.addEventListener("DOMContentLoaded", function () {
     const contentDiv1 = document.getElementById('div1');
 
     function loadContent(url, viewName, content, scriptPath) {
@@ -108,9 +86,32 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Handle browser back/forward button
-    window.addEventListener('popstate', function () {
-        loadInitialContent();
+    window.addEventListener('popstate', function (event) {
+        const state = event.state;
+
+        if (state) {
+            // Restore the state without pushing a new one
+            loadContent(state.url, state.viewName, contentDiv1, state.scriptPath, false);
+
+            const urlSegments = state.url.split('/');
+            const moduleId = urlSegments[3];
+            const lessonType = urlSegments[4];
+            const lessonId = urlSegments[5];
+
+            const selectedLesson = document.querySelector(`.lesson-item[data-lesson-id="${lessonId}"][data-lesson-type="${lessonType}"]`);
+
+            if (selectedLesson) {
+                const partContainer = selectedLesson.closest('.part-container');
+                const collapseElement = partContainer.querySelector('.collapse');
+
+                const bootstrapCollapse = new bootstrap.Collapse(collapseElement, { toggle: false });
+                bootstrapCollapse.show();
+
+                setActive(selectedLesson);
+            }
+        } else {
+            loadInitialContent();
+        }
     });
 
     // Load the appropriate content on initial load
