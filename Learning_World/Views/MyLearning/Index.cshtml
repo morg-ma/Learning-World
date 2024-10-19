@@ -3,10 +3,12 @@
     ViewData["Title"] = "Index";
 }
 
-<h1 class="mb-4">My Learning</h1>
+<div class="text-center wow fadeInUp">
+    <h1 class="section-title bg-white text-center text-primary px-3 mt-4">My Learning</h1>
+</div>
 
-<div class="btn-group mb-5" role="group">
-    <button id="InProgressBtn" class="btn btn-outline-primary" onclick="filterCourses('InProgress')">In Progress</button>
+<div class="btn-group wow fadeInUp" style="margin: 20px 100px;" role="group">
+    <button id="InProgressBtn" class="btn btn-primary" onclick="filterCourses('InProgress')">In Progress</button>
     <button id="CompletedBtn" class="btn btn-outline-primary" onclick="filterCourses('Completed')">Completed</button>
 </div>
 
@@ -16,6 +18,8 @@
 
 @section Scripts{
     <script>
+
+
         function filterCourses(filter) {
             // reset all buttons
             $('.btn-group .btn').removeClass('btn-primary').addClass('btn-outline-primary');

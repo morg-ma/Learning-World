@@ -3,11 +3,12 @@
     ViewData["Title"] = "CoursesOverView";
 }
 
-<h1>Courses Overview</h1>
+<div class="text-center wow fadeInUp">
+    <h1 class="section-title bg-white text-center text-primary px-3 mt-4">Courses Overview</h1>
+</div>
 
-<hr />
 <div class="mb-3">
-    <div id="searchForm" class="flex justify-content-center mt-2">
+    <div id="searchForm" class="flex justify-content-center mt-2 wow fadeInUp">
         <div class="nav justify-content-center">
             <input class="form-control d-inline w-50 me-1" type="search" id="searchInput" name="search" value="@Model.Search" placeholder="Search Courses" />
             <button class="btn btn-outline-primary" type="button" onclick="loadCourses()">Search</button>
@@ -15,9 +16,9 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row wow fadeInUp">
     <!-- Filter Sidebar -->
-    <div class="col-md-2">
+    <div class="col-md-2 p-5">
         <form id="filterForm" method="get">
             <h5>Level</h5>
             @foreach (var level in new List<string> { "Beginner", "Intermediate", "Advanced" })
@@ -41,10 +42,13 @@
             @foreach (var rate in new List<string> { "2", "3", "4" })
             {
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="@rate" name="Rates" value="@rate" @(Model.Rates.Contains(rate) ? "checked" : "")>
-                    <label class="form-check-label" for="@rate">@rate ⭐ or more</label>
+                    <input class="form-check-input" type="radio" id="@rate" name="Rates" value="@rate" @(Model.Rates.Contains(rate) ? "checked" : "")>
+                    <label class="form-check-label" for="@rate">
+                        @rate <small class="fa fa-arrow-up text-primary"></small>
+                    </label>
                 </div>
             }
+            <button class="btn btn-primary mt-2" type="reset" onclick="loadCourses()">Reset filter</button>
         </form>
     </div>
 
@@ -106,6 +110,9 @@
         }
 
         // Trigger AJAX when any filter or search input is changed
+        $('#filterForm input[type="radio"]').on('change', function () {
+            loadCourses();
+        });
         $('#filterForm input[type="checkbox"]').on('change', function () {
             loadCourses();
         });
