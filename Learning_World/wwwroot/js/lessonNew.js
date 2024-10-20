@@ -9,7 +9,7 @@
     function loadContent(url, viewName, content, pushState = true) {
         if (pushState) {
             // Push state to history only when navigating, not during popstate
-            history.pushState({ url, viewName, scriptPath }, '', url);
+            history.pushState({ url, viewName }, '', url);
         }
 
         fetch(viewName)
@@ -41,25 +41,11 @@
     });
 
     // Handle part title clicks to expand/collapse
-    //partTitles.forEach(title => {
-    //    title.addEventListener('click', function () {
-    //        const icon = this.querySelector('i');
-    //        icon.classList.toggle('bi-chevron-right');
-    //        icon.classList.toggle('bi-chevron-down');
-    //    });
-    //});
     partTitles.forEach(title => {
         title.addEventListener('click', function () {
             const icon = this.querySelector('i');
-            const target = document.querySelector(this.getAttribute('data-bs-target'));
-
-            if (target.classList.contains('show')) {
-                icon.classList.remove('bi-chevron-down');
-                icon.classList.add('bi-chevron-right');
-            } else {
-                icon.classList.remove('bi-chevron-right');
-                icon.classList.add('bi-chevron-down');
-            }
+            icon.classList.toggle('bi-chevron-right');
+            icon.classList.toggle('bi-chevron-down');
         });
     });
 
@@ -113,6 +99,9 @@
             if (selectedLesson) {
                 const partContainer = selectedLesson.closest('.part-container');
                 const collapseElement = partContainer.querySelector('.collapse');
+                const icon = partContainer  .querySelector('i');
+                icon.classList.toggle('bi-chevron-right');
+                icon.classList.toggle('bi-chevron-down');
 
                 const bootstrapCollapse = new bootstrap.Collapse(collapseElement, { toggle: false });
                 bootstrapCollapse.show();

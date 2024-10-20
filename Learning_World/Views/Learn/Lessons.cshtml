@@ -75,7 +75,6 @@
 	}
 </style>
 
-
 <div class="content-wrapper">
 	<!-- Sidebar -->
 	<div id="sidebar" class="border-end p-2">
@@ -87,10 +86,12 @@
 			@foreach (var part in Model)
 			{
 				<div class="part-container">
+					<!-- The collapse toggle button for the part -->
 					<div class="part-title" data-bs-toggle="collapse" data-bs-target="#part-@part.PartId">
 						<i class="bi bi-chevron-right"></i> @part.Title
 					</div>
 
+					<!-- The collapsible content -->
 					<div class="collapse" id="part-@part.PartId">
 						@foreach (var lesson in part.Lessons)
 						{
@@ -103,7 +104,7 @@
 								}
 								else
 								{
-								<i class="bi @GetLessonIcon(lesson.LessonType.TypeName) lesson-icon"></i>	
+									<i class="bi @GetLessonIcon(lesson.LessonType.TypeName) lesson-icon"></i>
 								}
 								<span class="lesson-title">@lesson.Title</span>
 							</a>
@@ -117,22 +118,14 @@
 	<!-- Main Content -->
 	<div class="lesson-content">
 		<a href="/Learn/index/@ViewBag.C_Id/module/@Model[0].ModuleId">Back to > @ViewBag.ModuleName</a>
-		<div id="main" >
+		<div id="main">
 			<!-- Lesson content will be loaded here -->
 		</div>
-		<button id="mark-btn" class="btn btn-primary">mark as comlpleted</button>
+		<button id="mark-btn" class="btn btn-primary">mark as completed</button>
 		<span id="completed-span"></span>
 	</div>
 </div>
 
-
-<div class="part-title" data-bs-toggle="collapse" data-bs-target="#collapseExample">
-	<i class="bi bi-chevron-right"></i> Part 1
-</div>
-<div class="collapse" id="collapseExample">
-	<div class="list-group-item">Lesson 1</div>
-	<div class="list-group-item">Lesson 2</div>
-</div>
 
 
 
@@ -152,12 +145,6 @@
 
 
 @section Scripts {
-
 	<script src="~/js/lessonNew.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-
-	
-
 
 }
