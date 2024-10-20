@@ -6,6 +6,9 @@
     const partTitles = document.querySelectorAll('.part-title');
     const contentDiv1 = document.getElementById('main');
 
+
+    // just push the url in the browser and excute the viewname
+
     function loadContent(url, viewName, content, pushState = true) {
         if (pushState) {
             // Push state to history only when navigating, not during popstate
@@ -30,7 +33,6 @@
         sidebar.classList.toggle('collapsed');
         menuText.textContent = sidebar.classList.contains('collapsed') ? 'Show menu' : 'Hide menu';
     });
- 
 
     // Handle lesson item clicks
     lessonItems.forEach(item => {
@@ -49,9 +51,6 @@
         });
     });
 
-
-
-
     // Set active lesson
     function setActive(element) {
         lessonItems.forEach(item => item.classList.remove('active-section'));
@@ -60,7 +59,7 @@
         }
     }
 
-    // Select and load a lesson
+    // Select and load a lesson when click
     function selectLesson(element) {
         const lessonId = element.dataset.lessonId;
         const lessonType = element.dataset.lessonType;
@@ -80,13 +79,13 @@
     };
 
     function myFunction(element) {
-        const spanText = document.getElementById("completed-span") 
+        const spanText = document.getElementById("completed-span")
         spanText.innerText = "Completed";
         element.innerText = "Go to next";
     }
 
 
-    // Load the initial content when the page loads
+    // Load the initial content when the page loads (not clicked on button)
     function loadInitialContent() {
         const urlSegments = window.location.pathname.split('/');
         const moduleId = urlSegments[3];
@@ -99,9 +98,6 @@
             if (selectedLesson) {
                 const partContainer = selectedLesson.closest('.part-container');
                 const collapseElement = partContainer.querySelector('.collapse');
-                const icon = partContainer  .querySelector('i');
-                icon.classList.toggle('bi-chevron-right');
-                icon.classList.toggle('bi-chevron-down');
 
                 const bootstrapCollapse = new bootstrap.Collapse(collapseElement, { toggle: false });
                 bootstrapCollapse.show();
@@ -115,10 +111,10 @@
                 );
             }
         } else {
-            const firstLesson = document.querySelector('.lesson-item');
-            if (firstLesson) {
-                selectLesson(firstLesson);
-            }
+            //const firstLesson = document.querySelector('.lesson-item');
+            //if (firstLesson) {
+            //    selectLesson(firstLesson);
+            //}
         }
     }
 
@@ -154,3 +150,4 @@
     // Load the appropriate content on initial load
     loadInitialContent();
 });
+
