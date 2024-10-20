@@ -146,11 +146,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-function checkBtn( lessonId, userid, moduleId) {
+function checkBtn( lessonId, moduleId) {
     const spanText = document.getElementById("completed-span")
     const lessonIcon = document.getElementById(`i-${lessonId}`)
     const btn = document.getElementById('mark-btn');
-    fetch(`/Learn/CompleteLesson/${moduleId}/${lessonId}/${userid}`, {
+    fetch(`/Learn/CompleteLesson/${moduleId}/${lessonId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

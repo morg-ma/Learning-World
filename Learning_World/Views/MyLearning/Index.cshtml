@@ -29,7 +29,7 @@
 
             // ajax call
             $.ajax({
-                url: "/MyLearning/" + filter + "Courses" + "?userId=" + @ViewBag.UserId,
+                url: "/MyLearning/" + filter + "Courses",
                 success: function (response) {
                     // The filtered courses
                     $('#courseList').html(response);

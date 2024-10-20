@@ -97,7 +97,10 @@
 							<a class="list-group-item lesson-item" href=""
 							   data-lesson-id="@lesson.LessonId" data-lesson-type="@lesson.LessonType.TypeName"
 							   data-module-id="@part.ModuleId">
-								@if (((List<LessonCompletion>)(ViewBag.isCompleted)).Exists(e => e.LessonID == lesson.LessonId && e.UserId == 1))
+							    @{
+									int userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
+							    }
+								@if (((List<LessonCompletion>)(ViewBag.isCompleted)).Exists(e => e.LessonID == lesson.LessonId && e.UserId == userId))
 								{
 									<i id="i-@lesson.LessonId" class="bi bi-check lesson-icon"></i>
 								}

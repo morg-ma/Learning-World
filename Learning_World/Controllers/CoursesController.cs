@@ -18,7 +18,6 @@ public class CoursesController : Controller
     {
         return View();
     }
-
     public async Task<IActionResult> CoursesOverView(List<string> Levels, List<string> Prices, List<string> Rates, string sortOrder = "MostPopular", string search = "", int pageNo = 1)
     {
         var courseVM = await Courses_VM_Mapper(_context.Courses, Levels, Prices, Rates, sortOrder, search, pageNo);

@@ -1,6 +1,8 @@
-﻿using Learning_World.Data;
+﻿using System.Security.Claims;
+using Learning_World.Data;
 using Learning_World.Models;
 using Learning_World.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 namespace Learning_World.Controllers
@@ -13,9 +15,9 @@ namespace Learning_World.Controllers
 			_context = elearningPlatform;
 		}
 
-		[Route("Courses/{courseId}/{userId}")]
+		[Route("Courses/view/{courseId}")]
 
-		public IActionResult ShowCourse(int courseId = 1, int userId = 1)
+		public IActionResult ShowCourse(int courseId = 1)
 		{
 			Course course = _context.Courses.Include(e => e.Users).FirstOrDefault(e => e.CourseId == courseId);
 			if (course == null)
@@ -25,17 +27,19 @@ namespace Learning_World.Controllers
 			ViewBag.modules = _context.Modules.Where(e => e.CourseId == courseId).ToList();
 			ViewBag.parts = _context.Parts.ToList();
 			ViewBag.lessons = _context.Lessons.ToList();
-			ViewBag.UserId = userId;
-			ViewBag.IsEnrolled = _context.Enrollments.FirstOrDefault(e => e.CourseId == courseId &&
-			e.UserId == userId) == null ? false : true;
-
+			ViewBag.IsEnrolled = false;
+			if (User.Identity.IsAuthenticated)
+			{
+			int userId = int.Parse(User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value);
+			ViewBag.IsEnrolled = _context.Enrollments.FirstOrDefault(e => e.CourseId == courseId &&e.UserId == userId) == null ? false : true;
+			}
 			return View(course);
 		}
 
-
-		public IActionResult Enroll(int courseId, int userId)
+		[Authorize]
+		[HttpGet]
+		public IActionResult Enroll(int courseId)
 		{
-			//ViewBag.CourseId = courseId; // Pass the course ID to the view
 			var course = _context.Courses.FirstOrDefault(c => c.CourseId == courseId);
 			if (course == null)
 				return NotFound();
@@ -44,10 +48,10 @@ namespace Learning_World.Controllers
 			userRegistration.CourseId = course.CourseId;
 			userRegistration.CourseName = course.Title;
 			userRegistration.CoursePrice = course.Price;
-			userRegistration.UserId = userId;
 
 			return View(userRegistration);
 		}
+		[Authorize]
 		[HttpPost]
 		public IActionResult Enroll(UserRegistrationViewModel model)
 		{
@@ -56,6 +60,7 @@ namespace Learning_World.Controllers
 				// Save user information to the database
 				//if (model.PaymentMethod == "CreditCard")
 				//{
+				int userId = int.Parse(User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value);
 
 				var CreditPayment = new Payment
 				{
@@ -69,7 +74,7 @@ namespace Learning_World.Controllers
 				var enrollment = new Enrollment
 				{
 					CourseId = model.CourseId,
-					UserId = model.UserId,
+					UserId = userId,
 					EnrollmentDate = DateTime.UtcNow,
 					Payment = CreditPayment
 				};
@@ -79,15 +84,8 @@ namespace Learning_World.Controllers
 				_context.SaveChanges();
 
 
-				// Validate and process credit card information
-				//}
-				//else if (model.PaymentMethod == "PayPal")
-				//{
-				//    //var PayPalPayment = new PaymentMethod { };
-				//    // Process PayPal payment
-				//}
-				// Redirect to a success page or return view
-				return RedirectToAction("Index", "MyLearning", new { userId = model.UserId });
+				
+				return RedirectToAction("Index", "MyLearning");
 				// return RedirectToAction("CourseView", new {courseId = model.Course.CourseId, userId = model.UserId});
 			}
 

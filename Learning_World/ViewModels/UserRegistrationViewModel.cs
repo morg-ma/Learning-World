@@ -10,7 +10,6 @@ namespace Learning_World.ViewModels
         public decimal CoursePrice { get; set; }
         [DisplayName("Username")]
         public string UserName { get; set; }
-        public int UserId { get; set; }
         public string Country { get; set; }
         // Credit Card Information
         public string CardName { get; set; }

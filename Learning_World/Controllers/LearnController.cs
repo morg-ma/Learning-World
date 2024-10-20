@@ -1,7 +1,9 @@
 ﻿using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 using Learning_World.Data;
 using Learning_World.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Plugins;
@@ -9,14 +11,17 @@ using NuGet.Versioning;
 
 namespace Learning_World.Controllers
 {
+    [Authorize]
     public class LearnController : Controller
     {
         ElearningPlatformContext _db;
-        public LearnController(ElearningPlatformContext _DbContext)
+
+		public LearnController(ElearningPlatformContext _DbContext)
         {
             _db = _DbContext;
-        }
-        public IActionResult Index(int id, int moduleId = 1)
+
+		}
+		public IActionResult Index(int id, int moduleId = 1)
         {
             var course = _db.Courses.FirstOrDefault(e => e.CourseId == id);
             ViewBag.CourseTilte = course.Title;
@@ -24,11 +29,13 @@ namespace Learning_World.Controllers
             ViewBag.Modules = modules;
             ViewBag.SelectedModuleId = moduleId;
             Dictionary<int, List<int>> keyValuePairs = new Dictionary<int, List<int>>();
-            foreach (var module in modules)
+			int userId = int.Parse(User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
+
+			foreach (var module in modules)
             {
                 keyValuePairs.Add(module.ModuleId,
                     new List<int>() { _db.Lessons.Include(e => e.Part).Where(e => e.Part.ModuleId == moduleId).Count(),
-                    _db.LessonCompletions.Where(e=>e.ModuleId == module.ModuleId).Count() });
+                    _db.LessonCompletions.Where(e=>e.ModuleId == module.ModuleId && e.UserId == userId).Count() });
             }
             ViewBag.KeyValuePairs = keyValuePairs;
             return View(modules);
@@ -59,7 +66,9 @@ namespace Learning_World.Controllers
         [Route("Learn/LessonDisplayPartialView/{moduleId?}/{lessonType}/{lessonId}")]
         public IActionResult LessonDisplayPartialView(int lessonId, string lessonType, int moduleId)
         {
-            ViewBag.isCompleted = _db.LessonCompletions.Where(e => e.ModuleId == moduleId).ToList()?? null;
+			int userId = int.Parse(User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
+
+			ViewBag.isCompleted = _db.LessonCompletions.Where(e => e.ModuleId == moduleId && e.UserId == userId).ToList()?? null;
             ViewBag.cousreId = _db.Modules.FirstOrDefault(e => e.ModuleId == moduleId).CourseId;
             switch (lessonType)
             {
@@ -81,10 +90,12 @@ namespace Learning_World.Controllers
         }
 
         [HttpPost]
-        [Route("Learn/CompleteLesson/{ModuleId}/{LessonId}/{UserId}")]
-        public void CompleteLesson(int lessonId, int UserId, int ModuleId)
+        [Route("Learn/CompleteLesson/{ModuleId}/{LessonId}")]
+        public void CompleteLesson(int lessonId, int ModuleId)
         {
-            _db.LessonCompletions.Add(new LessonCompletion() { LessonID = lessonId, UserId = UserId, ModuleId = ModuleId });
+			int userId = int.Parse(User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
+
+			_db.LessonCompletions.Add(new LessonCompletion() { LessonID = lessonId, UserId = userId, ModuleId = ModuleId });
             _db.SaveChanges();
         }
 
@@ -138,7 +149,7 @@ namespace Learning_World.Controllers
             bool passed = percentage >= quiz.PassingScore;
             if (passed)
             {
-                CompleteLesson(lessonId, 1, (int)_db.Lessons.Include(e => e.Part).FirstOrDefault(e => e.LessonId == lessonId).Part.ModuleId);
+                CompleteLesson(lessonId, (int)_db.Lessons.Include(e => e.Part).FirstOrDefault(e => e.LessonId == lessonId).Part.ModuleId);
             }
 
             // Return the percentage as part of the response
