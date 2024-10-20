@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Learning_World.Models;
 using Learning_World.ViewModels;
+using System.Reflection;
+using Microsoft.Data.SqlClient.DataClassification;
 
 namespace Learning_World.Controllers
 {
@@ -17,9 +19,27 @@ namespace Learning_World.Controllers
 
         public IActionResult Index(int userId)
         {
-            var inprogressCourses = FilterCourses(userId).Where(c => c.IsCompleted == false).ToList();
+            var courses = FilterCourses(userId).Select(c => new
+            {
+                CourseName = c.Key,  // Assuming c.Key is the course name
+                CompletionPercentage = c.Value,
+                IsCompleted = c.Value == 100  // Completed if the value is 100%
+            }).ToList();
+
+            List<MyLearningCoursesViewModel> myLearningCoursesViewModels = courses.Select(course => new MyLearningCoursesViewModel
+            {
+                UserId = userId,  // Assign UserId from your controller context
+                Course = _context.Courses.FirstOrDefault(e => e.CourseId == course.CourseName),
+                CompletionPercentage = course.CompletionPercentage,
+                CompletionDate = (from lc in _context.LessonCompletions
+                                  join module in _context.Modules on lc.ModuleId equals module.ModuleId
+                                  where module.CourseId == course.CourseName && lc.UserId == userId
+                                  orderby lc.CompletionDate descending
+                                  select lc.CompletionDate).FirstOrDefault(), // Get 
+                IsCompleted = course.IsCompleted
+            }).ToList();
             ViewBag.UserId = userId;
-            return View(inprogressCourses);
+            return View(myLearningCoursesViewModels);
         }
 
         public IActionResult MyCourses()
@@ -29,54 +49,71 @@ namespace Learning_World.Controllers
 
         public IActionResult InProgressCourses(int userId)
         {
-            var inprogressCourses = FilterCourses(userId).Where(c => c.IsCompleted == false).ToList();
+            var courses = FilterCourses(userId).Where(c => c.Value < 100).Select(c => new
+            {
+                CourseName = c.Key,  // Assuming c.Key is the course name
+                CompletionPercentage = c.Value,
+                IsCompleted = c.Value == 100  // Completed if the value is 100%
+            }).ToList();
+            List<MyLearningCoursesViewModel> myLearningCoursesViewModels = courses.Select(course => new MyLearningCoursesViewModel
+            {
+                UserId = userId,  // Assign UserId from your controller context
+                Course = _context.Courses.FirstOrDefault(e => e.CourseId == course.CourseName),
+                CompletionPercentage = course.CompletionPercentage,
+                IsCompleted = course.IsCompleted
+            }).ToList();
+
             ViewBag.UserId = userId;
-            return PartialView("_MyLearningCoursesPartial", inprogressCourses);
+            return PartialView("_MyLearningCoursesPartial", myLearningCoursesViewModels);
         }
 
         public IActionResult CompletedCourses(int userId)
         {
-            var completedCourse = FilterCourses(userId).Where(c => c.IsCompleted == true).ToList();
+            var courses = FilterCourses(userId).Where(c => c.Value == 100)  // Only select completed courses
+        .Select(c => new
+        {
+        CourseName = c.Key,  // Assuming c.Key is the course name
+        CompletionPercentage = c.Value,
+        IsCompleted = c.Value == 100  // Completed if the value is 100%
+        }).ToList();
+
+            List<MyLearningCoursesViewModel> myLearningCoursesViewModels = courses.Select(course => new MyLearningCoursesViewModel
+            {
+                UserId = userId,  // Assign UserId from your controller context
+                Course = _context.Courses.FirstOrDefault(e => e.CourseId == course.CourseName),
+                CompletionDate = (from lc in _context.LessonCompletions
+                                  join module in _context.Modules on lc.ModuleId equals module.ModuleId
+                                  where module.CourseId == course.CourseName && lc.UserId == userId
+                                  orderby lc.CompletionDate descending
+                                  select lc.CompletionDate).FirstOrDefault(), // Get 
+                CompletionPercentage = course.CompletionPercentage,
+                IsCompleted = course.IsCompleted
+            }).ToList();
+
+
             ViewBag.UserId = userId;
-            return PartialView("_MyLearningCoursesPartial", completedCourse);
+            return PartialView("_MyLearningCoursesPartial", myLearningCoursesViewModels);
         }
 
-        public List<MyLearningCoursesViewModel> FilterCourses(int userId)
+        public Dictionary<int?, int> FilterCourses(int userId)
         {
-            // Fetch all courses the user is enrolled in, along with their total and completed parts
-            var userCourses = _context.Enrollments
-                .Where(e => e.UserId == userId)
-                .Select(e => new
-                {
-                    Course = e.Course,
-                    TotalParts = e.Course.Modules.SelectMany(m => m.Parts).Count(),
-                    CompletedParts = e.Course.Modules.SelectMany(m => m.Parts)
-                        .Count(p => _context.Progresses.Any(pr => pr.UserId == userId && pr.PartId == p.PartId && pr.CompletionStatus))
-                })
-                .ToList();
-
-            List<MyLearningCoursesViewModel> inprogressCourses = new List<MyLearningCoursesViewModel>();
-
+            var userCourses = _context.Enrollments.Include(e => e.Course)
+                .Where(e => e.UserId == userId).ToList();
+            Dictionary<int?, int> keyValuePairs = new();
             foreach (var courseData in userCourses)
             {
-                if (courseData.TotalParts == 0)
-                    continue;
-
-                var completionPercentage = Math.Round((courseData.CompletedParts * 100m) / courseData.TotalParts, 2);
-
-                inprogressCourses.Add(new MyLearningCoursesViewModel()
+                var modules = _context.Modules.Where(e => e.CourseId == courseData.Course.CourseId).ToList();
+                int lessons = 0;
+                int completedLessons = 0;
+                foreach (var module in modules)
                 {
-                    UserId = userId,
-                    CompletionPercentage = completionPercentage,
-                    Course = courseData.Course,
-                    CompletionDate = _context.Progresses
-                        .Where(p => p.UserId == userId && p.CompletionStatus == true)
-                        .Max(p => p.CompletionDate),
-                    IsCompleted = courseData.TotalParts == courseData.CompletedParts ? true : false
-                });
+                    lessons += _context.Lessons.Include(e => e.Part).Where(e => e.Part.ModuleId == module.ModuleId).Count();
+                    completedLessons += _context.LessonCompletions.Where(e => e.ModuleId == module.ModuleId && e.UserId == userId).Count();
+                }
+                int progress = lessons > 0 ? (int)((double)completedLessons / lessons * 100) : 0;
+                keyValuePairs.Add(courseData.CourseId, progress);
             }
-
-            return inprogressCourses;
+            return keyValuePairs;
         }
     }
 }

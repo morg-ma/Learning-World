@@ -16,11 +16,13 @@ public partial class ElearningPlatformContext : DbContext
     {
     }
     public virtual DbSet<Payment> Payments { get; set; }
+  
 
 
     public virtual DbSet<AdminLog> AdminLogs { get; set; }
+    public virtual DbSet<LessonCompletion> LessonCompletions{ get; set; }
 
-    public virtual DbSet<Category> Categories { get; set; }
+	public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<Certificate> Certificates { get; set; }
 
@@ -60,7 +62,13 @@ public partial class ElearningPlatformContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<AdminLog>(entity =>
+        
+
+        modelBuilder.Entity<LessonCompletion>()
+			   .HasKey(lc => new { lc.UserId, lc.LessonID });
+
+
+		modelBuilder.Entity<AdminLog>(entity =>
         {
             entity.HasKey(e => e.LogId).HasName("PK__AdminLog__5E5499A8D60897DA");
 
