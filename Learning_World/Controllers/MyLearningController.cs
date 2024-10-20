@@ -15,8 +15,7 @@ namespace Learning_World.Controllers
             _context = context;
         }
 
-        // http://localhost:5020/MyLearning/Index?userId=1
-        public IActionResult Index(int userId = 1)
+        public IActionResult Index(int userId)
         {
             var inprogressCourses = FilterCourses(userId).Where(c => c.IsCompleted == false).ToList();
             ViewBag.UserId = userId;
