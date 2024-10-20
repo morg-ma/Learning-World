@@ -1,28 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using Learning_World.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Learning_World.Data;
 
-public partial class ElearningPlatformContext : DbContext
+public partial class ElearningPlatformContext : IdentityDbContext<User, IdentityRole<int>, int>
 {
-    public ElearningPlatformContext()
+
+    public ElearningPlatformContext() : base()
     {
+
     }
 
     public ElearningPlatformContext(DbContextOptions<ElearningPlatformContext> options)
-        : base(options)
+           : base(options)
     {
     }
+
+    //Add any additional configuration methods here
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+    }
+
     public virtual DbSet<Payment> Payments { get; set; }
-  
 
 
-    public virtual DbSet<AdminLog> AdminLogs { get; set; }
-    public virtual DbSet<LessonCompletion> LessonCompletions{ get; set; }
+    public virtual DbSet<LessonCompletion> LessonCompletions { get; set; }
 
-	public virtual DbSet<Category> Categories { get; set; }
+    public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<Certificate> Certificates { get; set; }
 
@@ -48,38 +57,31 @@ public partial class ElearningPlatformContext : DbContext
 
     public virtual DbSet<QuizQuestion> QuizQuestions { get; set; }
 
-    public virtual DbSet<Role> Roles { get; set; }
 
-    public virtual DbSet<User> Users { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=.;Database=ELearningPlatform;Trusted_Connection=True;Trust Server Certificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        
+        //    base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<LessonCompletion>()
-			   .HasKey(lc => new { lc.UserId, lc.LessonID });
+      .HasKey(lc => new { lc.UserId, lc.LessonID });
 
+        //    modelBuilder.Entity<LessonQuiz>()
+        //  .HasKey(lc => lc.LessonId);
 
-		modelBuilder.Entity<AdminLog>(entity =>
-        {
-            entity.HasKey(e => e.LogId).HasName("PK__AdminLog__5E5499A8D60897DA");
+        //    modelBuilder.Entity<LessonText>()
+        // .HasKey(lc => lc.LessonId);
+        //    modelBuilder.Entity<LessonVideo>()
+        // .HasKey(lc => lc.LessonId);
 
-            entity.Property(e => e.LogId).HasColumnName("LogID");
-            entity.Property(e => e.ActionDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.ActionDescription).HasColumnType("ntext");
-            entity.Property(e => e.ActionType).HasMaxLength(100);
-            entity.Property(e => e.AdminId).HasColumnName("AdminID");
+        //    modelBuilder.Entity<QuizAnswer>()
+        //  .HasKey(lc => lc.AnswerId);
 
-            entity.HasOne(d => d.Admin).WithMany(p => p.AdminLogs)
-                .HasForeignKey(d => d.AdminId)
-                .HasConstraintName("FK__AdminLogs__Admin__6C190EBB");
-        });
+        //    modelBuilder.Entity<QuizQuestion>()
+        //  .HasKey(lc => lc.QuestionId);
+
+        //}
 
         modelBuilder.Entity<Category>(entity =>
         {
@@ -316,52 +318,8 @@ public partial class ElearningPlatformContext : DbContext
                 .HasConstraintName("FK__QuizQuest__Lesso__5165187F");
         });
 
-        modelBuilder.Entity<Role>(entity =>
-        {
-            entity.HasKey(e => e.RoleId).HasName("PK__Roles__8AFACE3A76B48721");
+            base.OnModelCreating(modelBuilder);
 
-            entity.HasIndex(e => e.RoleName, "UQ__Roles__8A2B6160D9631DE4").IsUnique();
-
-            entity.Property(e => e.RoleId).HasColumnName("RoleID");
-            entity.Property(e => e.RoleName).HasMaxLength(50);
-        });
-
-        modelBuilder.Entity<User>(entity =>
-        {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CCAC78E15E92");
-
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D1053488B33831").IsUnique();
-
-            entity.Property(e => e.UserId).HasColumnName("UserID");
-            entity.Property(e => e.Email).HasMaxLength(255);
-            entity.Property(e => e.Name).HasMaxLength(100);
-            entity.Property(e => e.PasswordHash).HasMaxLength(255);
-            entity.Property(e => e.RegistrationDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-
-            entity.HasMany(d => d.Roles).WithMany(p => p.Users)
-                .UsingEntity<Dictionary<string, object>>(
-                    "UserRole",
-                    r => r.HasOne<Role>().WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK__UserRoles__RoleI__2B3F6F97"),
-                    l => l.HasOne<User>().WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK__UserRoles__UserI__2A4B4B5E"),
-                    j =>
-                    {
-                        j.HasKey("UserId", "RoleId").HasName("PK__UserRole__AF27604F1841E1CE");
-                        j.ToTable("UserRoles");
-                        j.IndexerProperty<int>("UserId").HasColumnName("UserID");
-                        j.IndexerProperty<int>("RoleId").HasColumnName("RoleID");
-                    });
-        });
-
-        OnModelCreatingPartial(modelBuilder);
     }
 
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

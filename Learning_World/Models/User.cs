@@ -1,19 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
 
 namespace Learning_World.Models;
 
-public partial class User
+public partial class User :IdentityUser<int>
 {
-    public int UserId { get; set; }
-    public string Name { get; set; } = null!;
     public string? Image { get; set; }
-    public string Email { get; set; } = null!;
-    public string PasswordHash { get; set; } = null!;
-
-    public DateTime RegistrationDate { get; set; }
-
-    public virtual ICollection<AdminLog> AdminLogs { get; set; } = new List<AdminLog>();
 
     public virtual ICollection<Certificate> Certificates { get; set; } = new List<Certificate>();
 
@@ -21,5 +14,4 @@ public partial class User
 
     public virtual ICollection<Course> Courses { get; set; } = new List<Course>();
 
-    public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
 }

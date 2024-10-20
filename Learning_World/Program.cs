@@ -1,4 +1,7 @@
+using System;
 using Learning_World.Data;
+using Learning_World.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,9 +9,32 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddDistributedMemoryCache();
 
-builder.Services.AddDbContext<ElearningPlatformContext>(
-                options => options.UseSqlServer(builder.Configuration.GetConnectionString("connectionString")));
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(20);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+
+builder.Services.AddIdentity<User, IdentityRole<int>>(
+               options =>
+               {
+                   options.Password.RequireDigit = false;
+                   options.Password.RequireLowercase = false;
+                   options.Password.RequireUppercase = false;
+                   options.Password.RequireNonAlphanumeric = false;
+                   options.Password.RequiredLength = 4;
+               }
+               ).AddEntityFrameworkStores<ElearningPlatformContext>()
+               .AddDefaultTokenProviders(); 
+
+builder.Services.AddDbContext<ElearningPlatformContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("connectionString")));
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -20,6 +46,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
@@ -27,7 +55,7 @@ app.UseEndpoints(endpoints =>
     // Default route
     _ = endpoints.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
+        pattern: "{controller=Main}/{action=Index}/{id?}");
 
     // Module route for rendering the full page
     _ = endpoints.MapControllerRoute(

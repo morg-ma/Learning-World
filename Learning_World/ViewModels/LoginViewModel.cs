@@ -6,8 +6,8 @@ namespace Learning_World.ViewModels
     {
         [Required]
         public String Name { get; set; }
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
+        [DataType(dataType: DataType.Password)]
+        public string Password { get; set; } = null!;
         [Display(Name = "Remeber Me")]
         public bool Remember { get; set; }
     }
