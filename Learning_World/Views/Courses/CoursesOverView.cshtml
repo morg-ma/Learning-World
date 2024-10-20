@@ -4,7 +4,7 @@
 }
 
 <div class="text-center wow fadeInUp">
-    <h1 class="section-title bg-white text-center text-primary px-3 mt-4">Courses Overview</h1>
+    <h1 class="section-title bg-white text-center text-primary px-3 mt-4">Courses</h1>
 </div>
 
 <div class="mb-3">
@@ -16,9 +16,9 @@
     </div>
 </div>
 
-<div class="row wow fadeInUp">
+<div class="row wow fadeInUp" style="width: 100%;" >
     <!-- Filter Sidebar -->
-    <div class="col-md-2 p-5">
+    <div class="col-md-2 p-5" > 
         <form id="filterForm" method="get">
             <h5>Level</h5>
             @foreach (var level in new List<string> { "Beginner", "Intermediate", "Advanced" })
@@ -66,7 +66,7 @@
         </div>
 
         <!-- Container for courses -->
-        <div id="filteredCourses">
+        <div id="filteredCourses" class="pe-5 ps-5">
             @await Html.PartialAsync("_CoursesOverviewPartial", Model)
         </div>
     </div>
