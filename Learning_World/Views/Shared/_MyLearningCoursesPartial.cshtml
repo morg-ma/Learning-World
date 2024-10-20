@@ -44,7 +44,7 @@
 
                     <!-- Buttons (Resume & Reset Deadlines) -->
                     <div class="d-flex justify-content-end">
-                        <a asp-action="CourseDetails" asp-route-courseId="@course.Course.CourseId" class="btn btn-primary">@(course.IsCompleted ? "Review" : "Resume")</a>
+                        <a asp-action="Index" asp-controller="Learn" asp-route-id="@course.Course.CourseId" class="btn btn-primary">@(course.IsCompleted ? "Review" : "Resume")</a>
                     </div>
                 </div>
             </div>

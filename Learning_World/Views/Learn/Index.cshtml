@@ -3,8 +3,9 @@
     ViewData["Title"] = "index";
 }
 
-<h5>@ViewBag.CourseTilte</h5>
-<div id="main-body">
+
+<div id="main-body" class="p-4">
+    <h5>@ViewBag.CourseTilte</h5>
     <section style="display:flex; gap:3em;">
         <article class="border rounded p-3" style="flex:1; width: 250px; background-color: #f8f9fa;">
             <h6 class="fw-bold mb-3">Course Material</h6>
@@ -36,7 +37,7 @@
             </ul>
         </article>
 
-        <article class="border border-secondary" style="flex:3">
+        <article class="border pb-4" style="flex:3">
             <div id="div1"></div>
         </article>
     </section>

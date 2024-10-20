@@ -6,7 +6,7 @@ namespace Learning_World.ViewModels
     public class UserProfileViewModel
     {
         public int Id { get; set; }
-        public string Image {  get; set; }
+        public string? Image {  get; set; }
         public IFormFile? ImageFile { get; set; } // File upload for image
         [Required(ErrorMessage = "Name is required")]
         public string Name { get; set; }

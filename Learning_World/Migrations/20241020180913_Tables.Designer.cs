@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Learning_World.Migrations
 {
     [DbContext(typeof(ElearningPlatformContext))]
-    [Migration("20241018134754_AddUserImage")]
-    partial class AddUserImage
+    [Migration("20241020180913_Tables")]
+    partial class Tables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -224,10 +224,10 @@ namespace Learning_World.Migrations
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("(getdate())");
 
-                    b.Property<int>("PaymentMethodID")
+                    b.Property<int>("PaymentID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int")
                         .HasColumnName("UserID");
 
@@ -236,7 +236,8 @@ namespace Learning_World.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("PaymentMethodID");
+                    b.HasIndex("PaymentID")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -279,6 +280,29 @@ namespace Learning_World.Migrations
                     b.HasIndex("PartId");
 
                     b.ToTable("Lessons");
+                });
+
+            modelBuilder.Entity("Learning_World.Models.LessonCompletion", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LessonID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CompletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ModuleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "LessonID");
+
+                    b.HasIndex("LessonID");
+
+                    b.HasIndex("ModuleId");
+
+                    b.ToTable("LessonCompletions");
                 });
 
             modelBuilder.Entity("Learning_World.Models.LessonQuiz", b =>
@@ -420,21 +444,24 @@ namespace Learning_World.Migrations
                     b.ToTable("Parts");
                 });
 
-            modelBuilder.Entity("Learning_World.Models.PaymentMethod", b =>
+            modelBuilder.Entity("Learning_World.Models.Payment", b =>
                 {
-                    b.Property<int>("PaymentMethodID")
+                    b.Property<int>("PaymentID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentMethodID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentID"));
 
                     b.Property<string>("CVC")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CardName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CardNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Country")
@@ -442,18 +469,12 @@ namespace Learning_World.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ExpiryDate")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PayPalEmail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PaymentType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("PaymentMethodID");
+                    b.HasKey("PaymentID");
 
-                    b.ToTable("PaymentMethods");
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("Learning_World.Models.Progress", b =>
@@ -730,20 +751,22 @@ namespace Learning_World.Migrations
                         .HasForeignKey("CourseId")
                         .HasConstraintName("FK__Enrollmen__Cours__59063A47");
 
-                    b.HasOne("Learning_World.Models.PaymentMethod", "PaymentMethod")
-                        .WithMany()
-                        .HasForeignKey("PaymentMethodID")
+                    b.HasOne("Learning_World.Models.Payment", "Payment")
+                        .WithOne("Enrollment")
+                        .HasForeignKey("Learning_World.Models.Enrollment", "PaymentID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Learning_World.Models.User", "User")
                         .WithMany("Enrollments")
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("FK__Enrollmen__UserI__5812160E");
 
                     b.Navigation("Course");
 
-                    b.Navigation("PaymentMethod");
+                    b.Navigation("Payment");
 
                     b.Navigation("User");
                 });
@@ -763,6 +786,33 @@ namespace Learning_World.Migrations
                     b.Navigation("LessonType");
 
                     b.Navigation("Part");
+                });
+
+            modelBuilder.Entity("Learning_World.Models.LessonCompletion", b =>
+                {
+                    b.HasOne("Learning_World.Models.Lesson", "Lesson")
+                        .WithMany()
+                        .HasForeignKey("LessonID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Learning_World.Models.Module", "Module")
+                        .WithMany()
+                        .HasForeignKey("ModuleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Learning_World.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Lesson");
+
+                    b.Navigation("Module");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Learning_World.Models.LessonQuiz", b =>
@@ -927,6 +977,12 @@ namespace Learning_World.Migrations
                     b.Navigation("Lessons");
 
                     b.Navigation("Progresses");
+                });
+
+            modelBuilder.Entity("Learning_World.Models.Payment", b =>
+                {
+                    b.Navigation("Enrollment")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Learning_World.Models.QuizQuestion", b =>
