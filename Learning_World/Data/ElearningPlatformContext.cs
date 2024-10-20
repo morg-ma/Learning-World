@@ -44,15 +44,11 @@ public partial class ElearningPlatformContext : DbContext
 
     public virtual DbSet<Part> Parts { get; set; }
 
-    public virtual DbSet<Progress> Progresses { get; set; }
-
     public virtual DbSet<QuizAnswer> QuizAnswers { get; set; }
 
     public virtual DbSet<QuizQuestion> QuizQuestions { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
-
-    public virtual DbSet<Transaction> Transactions { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -294,26 +290,6 @@ public partial class ElearningPlatformContext : DbContext
                 .HasConstraintName("FK__Parts__ModuleID__3F466844");
         });
 
-        modelBuilder.Entity<Progress>(entity =>
-        {
-            entity.HasKey(e => e.ProgressId).HasName("PK__Progress__BAE29C85AE882904");
-
-            entity.HasIndex(e => new { e.UserId, e.PartId }, "UQ_UserPart").IsUnique();
-
-            entity.Property(e => e.ProgressId).HasColumnName("ProgressID");
-            entity.Property(e => e.CompletionDate).HasColumnType("datetime");
-            entity.Property(e => e.PartId).HasColumnName("PartID");
-            entity.Property(e => e.UserId).HasColumnName("UserID");
-
-            entity.HasOne(d => d.Part).WithMany(p => p.Progresses)
-                .HasForeignKey(d => d.PartId)
-                .HasConstraintName("FK__Progresse__PartI__5DCAEF64");
-
-            entity.HasOne(d => d.User).WithMany(p => p.Progresses)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Progresse__UserI__5CD6CB2B");
-        });
-
         modelBuilder.Entity<QuizAnswer>(entity =>
         {
             entity.HasKey(e => e.AnswerId).HasName("PK__QuizAnsw__D48250242E8B8C67");
@@ -348,28 +324,6 @@ public partial class ElearningPlatformContext : DbContext
 
             entity.Property(e => e.RoleId).HasColumnName("RoleID");
             entity.Property(e => e.RoleName).HasMaxLength(50);
-        });
-
-        modelBuilder.Entity<Transaction>(entity =>
-        {
-            entity.HasKey(e => e.TransactionId).HasName("PK__Transact__55433A4BA4332E5C");
-
-            entity.Property(e => e.TransactionId).HasColumnName("TransactionID");
-            entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
-            entity.Property(e => e.CourseId).HasColumnName("CourseID");
-            entity.Property(e => e.Status).HasMaxLength(50);
-            entity.Property(e => e.TransactionDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.UserId).HasColumnName("UserID");
-
-            entity.HasOne(d => d.Course).WithMany(p => p.Transactions)
-                .HasForeignKey(d => d.CourseId)
-                .HasConstraintName("FK__Transacti__Cours__6383C8BA");
-
-            entity.HasOne(d => d.User).WithMany(p => p.Transactions)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Transacti__UserI__628FA481");
         });
 
         modelBuilder.Entity<User>(entity =>
