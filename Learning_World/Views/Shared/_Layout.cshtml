@@ -72,7 +72,10 @@
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                     <li><a class="dropdown-item" asp-action="Index" asp-controller="MyLearning">My Learning</a></li>
-                    <li><a class="dropdown-item" asp-action="View" asp-controller="Profile">Profile</a></li>
+                    @{
+                        var userId = Context.Request.Cookies["UserId"];
+                    }
+                    <li><a class="dropdown-item" asp-action="View" asp-controller="Profile" asp-route-id="@userId" >Profile</a></li>
                     <li><a class="dropdown-item" href="#">Log Out</a></li>
                 </ul>
             </div>
