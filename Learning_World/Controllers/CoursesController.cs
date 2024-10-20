@@ -19,9 +19,9 @@ public class CoursesController : Controller
         return View();
     }
 
-    public async Task<IActionResult> CoursesOverView(string sortOrder, List<string> Levels, List<string> Prices, List<string> Rates, string search = "", int pageNo = 1)
+    public async Task<IActionResult> CoursesOverView(List<string> Levels, List<string> Prices, List<string> Rates, string sortOrder = "MostPopular", string search = "", int pageNo = 1)
     {
-        var courseVM = await Courses_VM_Mapper(_context.Courses.AsQueryable(), Levels, Prices, Rates, sortOrder, search, pageNo);
+        var courseVM = await Courses_VM_Mapper(_context.Courses, Levels, Prices, Rates, sortOrder, search, pageNo);
 
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
         {
@@ -48,13 +48,13 @@ public class CoursesController : Controller
     {
         if (!string.IsNullOrEmpty(search))
         {
-            courses = courses.Where(c => c.Title.StartsWith(search));
+            courses = courses.Where(c => c.Title.Contains(search));
         }
         return courses;
     }
 
     [NonAction]
-    public async Task<CoursesOverviewViewModel> Courses_VM_Mapper(IQueryable<Course> courses, List<string> Levels, List<string> Prices, List<string> Rates, string sortBy = "MostPopular", string search = "", int pageNumber = 1)
+    public async Task<CoursesOverviewViewModel> Courses_VM_Mapper(IQueryable<Course> courses, List<string> Levels, List<string> Prices, List<string> Rates, string sortBy, string search, int pageNumber)
     {
         courses = SortCourses(courses, sortBy);
         courses = SearchCourses(courses, search);
