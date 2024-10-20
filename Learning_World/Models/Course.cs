@@ -31,8 +31,6 @@ public partial class Course
 
     public virtual ICollection<Module> Modules { get; set; } = new List<Module>();
 
-    public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
-
     public virtual ICollection<Category> Categories { get; set; } = new List<Category>();
 
     public virtual ICollection<User> Users { get; set; } = new List<User>();

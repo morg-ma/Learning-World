@@ -19,10 +19,6 @@ public partial class User
 
     public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
 
-    public virtual ICollection<Progress> Progresses { get; set; } = new List<Progress>();
-
-    public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
-
     public virtual ICollection<Course> Courses { get; set; } = new List<Course>();
 
     public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
