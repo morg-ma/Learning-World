@@ -1,8 +1,14 @@
 ﻿using Learning_World.Data;
-using Learning_World.Models;
 using Learning_World.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing;
+using SixLabors.ImageSharp.Drawing.Processing;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
+
 namespace Learning_World.Controllers
 {
     public class ProfileController : Controller
@@ -32,6 +38,7 @@ namespace Learning_World.Controllers
             {
                 return NotFound();
             }
+
             var viewModel = new UserProfileViewModel
             {
                 Id = UserId,
@@ -46,15 +53,22 @@ namespace Learning_World.Controllers
                     IssueDate = c.IssueDate
                 }).ToList()
             };
+
             return View(viewModel);
         }
-        public IActionResult Edit(int Id)
+        public async Task<IActionResult> Edit(int id)
         {
-            User user = _context.Users.FirstOrDefault(e=>e.UserId == Id);
+            var user = await _context.Users
+                .Include(u => u.Roles)
+                .Include(u => u.Certificates)
+                    .ThenInclude(c => c.Course)
+                .FirstOrDefaultAsync(e => e.UserId == id);
+
             if (user == null)
             {
                 return NotFound();
             }
+
             var viewModel = new UserProfileViewModel
             {
                 Id = user.UserId,
@@ -69,55 +83,112 @@ namespace Learning_World.Controllers
                     IssueDate = c.IssueDate
                 }).ToList()
             };
+
             return View(viewModel);
         }
         [HttpPost]
-        public IActionResult SaveEdit(int id, UserProfileViewModel user)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveEdit(int id, UserProfileViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return View("Edit");
+                return View("Edit", model);
             }
 
-            User UserFromDataBase = _context.Users.FirstOrDefault(e => e.UserId == id);
-            if (UserFromDataBase == null)
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
             {
                 return NotFound();
             }
 
             // Handle image upload
-            if (user.ImageFile != null)
+            if (model.ImageFile != null)
             {
-                // Ensure wwwroot/images directory exists
-                var imagePath = Path.Combine(_hostingEnvironment.WebRootPath, "images");
+                var imagePath = System.IO.Path.Combine(_hostingEnvironment.WebRootPath, "images");
+                Directory.CreateDirectory(imagePath); // Ensure directory exists
 
-                if (!Directory.Exists(imagePath))
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + System.IO.Path.GetFileName(model.ImageFile.FileName);
+                var filePath = System.IO.Path.Combine(imagePath, uniqueFileName);
+
+                using (var image = Image.Load(model.ImageFile.OpenReadStream()))
                 {
-                    Directory.CreateDirectory(imagePath);
+                    image.Mutate(x => x
+                        .Resize(new ResizeOptions
+                        {
+                            Size = new Size(230, 230),  // Resize to 230x230 pixels
+                            Mode = ResizeMode.Crop      // Crop to ensure the image fits exactly
+                        })
+                        .ApplyRoundedCorners(115)       // Apply circular crop with a radius of 115 (half of 230)
+                    );
+
+                    await image.SaveAsync(filePath, new PngEncoder());
+                }
+                // Delete the old image if it exists
+                if (!string.IsNullOrEmpty(user.Image))
+                {
+                    var oldImagePath = System.IO.Path.Combine(imagePath, user.Image);
+                    if (System.IO.File.Exists(oldImagePath))
+                    {
+                        System.IO.File.Delete(oldImagePath);
+                    }
                 }
 
-                // Save the image with a unique name to avoid conflicts
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(user.ImageFile.FileName);
-                var filePath = Path.Combine(imagePath, uniqueFileName);
-
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    user.ImageFile.CopyTo(fileStream);
-                }
-
-                // Save only the file name (e.g., "unique_filename.jpg") in the database
-                UserFromDataBase.Image = uniqueFileName;
+                user.Image = uniqueFileName;
             }
-
             // Update other user details
-            UserFromDataBase.Name = user.Name;
-            UserFromDataBase.Email = user.Email;
-
-            _context.Users.Update(UserFromDataBase);
-            _context.SaveChanges();
-
-            return RedirectToAction("View", new { UserId = UserFromDataBase.UserId });
+            user.Name = model.Name;
+            user.Email = model.Email;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction("View", new { UserId = user.UserId });
         }
+        private bool UserExists(int id)
+        {
+            return _context.Users.Any(e => e.UserId == id);
+        }
+    }
+    public static class ImageProcessingExtensions
+    {
+        public static IImageProcessingContext ApplyRoundedCorners(this IImageProcessingContext ctx, float cornerRadius)
+        {
+            Size size = ctx.GetCurrentSize();
+            IPathCollection corners = BuildCorners(size.Width, size.Height, cornerRadius);
+            ctx.SetGraphicsOptions(new GraphicsOptions()
+            {
+                Antialias = true,
+                AlphaCompositionMode = PixelAlphaCompositionMode.DestOut
+            });
+            foreach (var c in corners)
+            {
+                ctx = ctx.Fill(Color.Red, c);
+            }
+            return ctx;
+        }
+        private static IPathCollection BuildCorners(int imageWidth, int imageHeight, float cornerRadius)
+        {
+            // Create a square
+            var rect = new RectangularPolygon(-0.5f, -0.5f, cornerRadius, cornerRadius);
+            // then cut out of the square a circle so we are left with a corner
+            IPath cornerTopLeft = rect.Clip(new EllipsePolygon(cornerRadius - 0.5f, cornerRadius - 0.5f, cornerRadius));
+            // corner is now a corner shape positions top left
+            var cornerTopRight = cornerTopLeft.RotateDegree(90).Translate(imageWidth - cornerRadius, 0);
+            var cornerBottomLeft = cornerTopLeft.RotateDegree(-90).Translate(0, imageHeight - cornerRadius);
+            var cornerBottomRight = cornerTopLeft.RotateDegree(180).Translate(imageWidth - cornerRadius, imageHeight - cornerRadius);
 
+            return new PathCollection(cornerTopLeft, cornerTopRight, cornerBottomLeft, cornerBottomRight);
+        }
     }
 }
