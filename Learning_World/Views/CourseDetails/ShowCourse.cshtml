@@ -12,7 +12,14 @@
             {
                 <p class="lead">Instructor: @item.Name</p>
             }
-            <a asp-action="Enroll" asp-route-courseId="@Model.CourseId" asp-route-userId="@ViewBag.UserId" class="btn btn-light btn-lg mt-3">Enroll Now</a>
+            @if (@ViewBag.IsEnrolled)
+            {
+                <a asp-controller="Learn" asp-action="Index" asp-route-id="@Model.CourseId" class="btn btn-light btn-lg mt-3">Go to course</a>
+            }
+            else
+            {
+                <a asp-action="Enroll" asp-route-courseId="@Model.CourseId" asp-route-userId="@ViewBag.UserId" class="btn btn-light btn-lg mt-3">Enroll Now</a>
+            }
         </div>
     </header>
 

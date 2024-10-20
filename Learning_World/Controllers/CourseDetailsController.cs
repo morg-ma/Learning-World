@@ -26,7 +26,6 @@ namespace Learning_World.Controllers
 			ViewBag.parts = _context.Parts.ToList();
 			ViewBag.lessons = _context.Lessons.ToList();
 			ViewBag.UserId = userId;
-
 			ViewBag.IsEnrolled = _context.Enrollments.FirstOrDefault(e => e.CourseId == courseId &&
 			e.UserId == userId) == null ? false : true;
 
