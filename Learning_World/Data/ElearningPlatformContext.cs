@@ -16,6 +16,7 @@ public partial class ElearningPlatformContext : DbContext
     {
     }
     public virtual DbSet<Payment> Payments { get; set; }
+  
 
 
     public virtual DbSet<AdminLog> AdminLogs { get; set; }
@@ -61,8 +62,9 @@ public partial class ElearningPlatformContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        
 
-		modelBuilder.Entity<LessonCompletion>()
+        modelBuilder.Entity<LessonCompletion>()
 			   .HasKey(lc => new { lc.UserId, lc.LessonID });
 
 

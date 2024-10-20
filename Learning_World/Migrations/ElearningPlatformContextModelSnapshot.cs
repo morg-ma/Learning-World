@@ -224,7 +224,7 @@ namespace Learning_World.Migrations
                     b.Property<int>("PaymentID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int")
                         .HasColumnName("UserID");
 
@@ -754,6 +754,8 @@ namespace Learning_World.Migrations
                     b.HasOne("Learning_World.Models.User", "User")
                         .WithMany("Enrollments")
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("FK__Enrollmen__UserI__5812160E");
 
                     b.Navigation("Course");

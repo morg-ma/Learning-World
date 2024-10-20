@@ -26,11 +26,10 @@
 	.lesson-content {
 		flex: 3;
 		transition: all 0.3s ease;
-		overflow-y: hidden; 
+		overflow-y: hidden;
 		padding: 1rem;
 		position: relative;
-		height:100%;
-		
+		height: 100%;
 	}
 
 	#sidebar.collapsed ~ .lesson-content {
@@ -100,11 +99,11 @@
 							   data-module-id="@part.ModuleId">
 								@if (((List<LessonCompletion>)(ViewBag.isCompleted)).Exists(e => e.LessonID == lesson.LessonId && e.UserId == 1))
 								{
-									<i class="bi bi-check lesson-icon"></i>
+									<i id="i-@lesson.LessonId" class="bi bi-check lesson-icon"></i>
 								}
 								else
 								{
-									<i class="bi @GetLessonIcon(lesson.LessonType.TypeName) lesson-icon"></i>
+									<i id="i-@lesson.LessonId" class="bi @GetLessonIcon(lesson.LessonType.TypeName) lesson-icon"></i>
 								}
 								<span class="lesson-title">@lesson.Title</span>
 							</a>
@@ -121,13 +120,9 @@
 		<div id="main">
 			<!-- Lesson content will be loaded here -->
 		</div>
-		<button id="mark-btn" class="btn btn-primary">mark as completed</button>
-		<span id="completed-span"></span>
+		
 	</div>
 </div>
-
-
-
 
 @functions {
 	string GetLessonIcon(string lessonType)
@@ -142,9 +137,7 @@
 	}
 }
 
-
-
 @section Scripts {
-	<script src="~/js/lessonNew.js"></script>
+	<script src="~/js/lesson.js"></script>
 
 }

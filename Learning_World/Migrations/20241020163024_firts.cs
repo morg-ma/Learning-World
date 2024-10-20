@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Learning_World.Migrations
 {
     /// <inheritdoc />
-    public partial class AddTables : Migration
+    public partial class firts : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -66,10 +66,10 @@ namespace Learning_World.Migrations
                     PaymentID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CardName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CardNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ExpiryDate = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CVC = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    CardName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CardNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExpiryDate = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CVC = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -222,7 +222,7 @@ namespace Learning_World.Migrations
                 {
                     EnrollmentID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserID = table.Column<int>(type: "int", nullable: true),
+                    UserID = table.Column<int>(type: "int", nullable: false),
                     CourseID = table.Column<int>(type: "int", nullable: true),
                     PaymentID = table.Column<int>(type: "int", nullable: false),
                     EnrollmentDate = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "(getdate())")
@@ -245,7 +245,8 @@ namespace Learning_World.Migrations
                         name: "FK__Enrollmen__UserI__5812160E",
                         column: x => x.UserID,
                         principalTable: "Users",
-                        principalColumn: "UserID");
+                        principalColumn: "UserID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -369,6 +370,38 @@ namespace Learning_World.Migrations
                         column: x => x.UserID,
                         principalTable: "Users",
                         principalColumn: "UserID");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LessonCompletions",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    LessonID = table.Column<int>(type: "int", nullable: false),
+                    ModuleId = table.Column<int>(type: "int", nullable: false),
+                    CompletionDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LessonCompletions", x => new { x.UserId, x.LessonID });
+                    table.ForeignKey(
+                        name: "FK_LessonCompletions_Lessons_LessonID",
+                        column: x => x.LessonID,
+                        principalTable: "Lessons",
+                        principalColumn: "LessonID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_LessonCompletions_Modules_ModuleId",
+                        column: x => x.ModuleId,
+                        principalTable: "Modules",
+                        principalColumn: "ModuleID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_LessonCompletions_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -510,6 +543,16 @@ namespace Learning_World.Migrations
                 column: "UserID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LessonCompletions_LessonID",
+                table: "LessonCompletions",
+                column: "LessonID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LessonCompletions_ModuleId",
+                table: "LessonCompletions",
+                column: "ModuleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Lessons_LessonTypeID",
                 table: "Lessons",
                 column: "LessonTypeID");
@@ -602,6 +645,9 @@ namespace Learning_World.Migrations
 
             migrationBuilder.DropTable(
                 name: "Enrollments");
+
+            migrationBuilder.DropTable(
+                name: "LessonCompletions");
 
             migrationBuilder.DropTable(
                 name: "LessonTexts");

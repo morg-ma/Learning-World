@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Learning_World.Migrations
 {
     [DbContext(typeof(ElearningPlatformContext))]
-    [Migration("20241019090550_add-lesson-completation")]
-    partial class addlessoncompletation
+    [Migration("20241020163024_firts")]
+    partial class firts
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -227,7 +227,7 @@ namespace Learning_World.Migrations
                     b.Property<int>("PaymentID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int")
                         .HasColumnName("UserID");
 
@@ -293,9 +293,14 @@ namespace Learning_World.Migrations
                     b.Property<DateTime>("CompletionDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("ModuleId")
+                        .HasColumnType("int");
+
                     b.HasKey("UserId", "LessonID");
 
                     b.HasIndex("LessonID");
+
+                    b.HasIndex("ModuleId");
 
                     b.ToTable("LessonCompletions");
                 });
@@ -752,6 +757,8 @@ namespace Learning_World.Migrations
                     b.HasOne("Learning_World.Models.User", "User")
                         .WithMany("Enrollments")
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("FK__Enrollmen__UserI__5812160E");
 
                     b.Navigation("Course");
@@ -786,6 +793,12 @@ namespace Learning_World.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Learning_World.Models.Module", "Module")
+                        .WithMany()
+                        .HasForeignKey("ModuleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Learning_World.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -793,6 +806,8 @@ namespace Learning_World.Migrations
                         .IsRequired();
 
                     b.Navigation("Lesson");
+
+                    b.Navigation("Module");
 
                     b.Navigation("User");
                 });
