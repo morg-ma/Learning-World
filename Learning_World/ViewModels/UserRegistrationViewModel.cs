@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Learning_World.ViewModels
 {
@@ -9,6 +10,7 @@ namespace Learning_World.ViewModels
         public string CourseName { get; set; }
         public decimal CoursePrice { get; set; }
         [DisplayName("Username")]
+        [Required]
         public string UserName { get; set; }
         public string Country { get; set; }
         // Credit Card Information
