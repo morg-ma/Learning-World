@@ -31,11 +31,10 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(
                    options.Password.RequiredLength = 4;
                }
                ).AddEntityFrameworkStores<ElearningPlatformContext>()
-               .AddDefaultTokenProviders(); 
+               .AddDefaultTokenProviders();
 
 builder.Services.AddDbContext<ElearningPlatformContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("connectionString")));
-
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
