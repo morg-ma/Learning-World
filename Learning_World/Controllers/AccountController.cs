@@ -43,9 +43,12 @@ namespace Learning_World.Controllers
                 if (result.Succeeded)
                 {
                     // add role user by default id need admin call the office
-                  //  await _UserManager.AddToRoleAsync(applicationUser, "user");
+                    //  await _UserManager.AddToRoleAsync(applicationUser, "user");
                     // cookie  
+                    await _UserManager.AddToRoleAsync(applicationUser, "student");//to make any one student
                     await _SignInManager.SignInAsync(applicationUser, false);
+                    Response.Cookies.Append("UserId", applicationUser.Id.ToString());// to Add Id in cookies
+
                     return RedirectToAction("Index", "Main");
                 }
                 foreach (var item in result.Errors)
@@ -75,7 +78,8 @@ namespace Learning_World.Controllers
                     {
                         await _SignInManager.SignInAsync(AppUser, user.Remember);
                         //await SignInManager.SignInAsync(AppUser,user.RememberME,);
-                       // TempData["success"] = $"LogIn successfuly\nwelcome {AppUser.UserName}";
+                        // TempData["success"] = $"LogIn successfuly\nwelcome {AppUser.UserName}";
+                        Response.Cookies.Append("UserId", AppUser.Id.ToString());// to Add Id in cookies
                         return RedirectToAction("Index", "Main");
                     }
                     ModelState.AddModelError("Password", "password is incorrect");
@@ -90,6 +94,7 @@ namespace Learning_World.Controllers
         public async Task<IActionResult> Logout()
         {
             await _SignInManager.SignOutAsync();
+            Response.Cookies.Delete("UserId");
             return RedirectToAction("Login");
         }
     }

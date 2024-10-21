@@ -46,14 +46,14 @@
                             <input asp-for="ImageFile" type="file" class="form-control" id="image" />
                             <span asp-validation-for="ImageFile" class="text-danger"></span>
                         </div>
-                        <button type="submit" class="btn btn-primary" asp-action="SaveEdit" asp-route-id="@Model.Id">Submit</button>
+                        <button type="submit" class="btn btn-primary" asp-action="SaveEdit" >Submit</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
     <div class="text-end m-5">
-        <a asp-controller="Profile" asp-action="View" asp-route-UserId="@Model.Id" class="btn btn-primary btn-lg shadow-sm">
+        <a asp-controller="Profile" asp-action="View" class="btn btn-primary btn-lg shadow-sm">
             <i class="fas fa-edit me-2"></i> Back
         </a>
     </div>
