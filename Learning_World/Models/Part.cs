@@ -18,6 +18,4 @@ public partial class Part
     public virtual ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
 
     public virtual Module? Module { get; set; }
-
-    public virtual ICollection<Progress> Progresses { get; set; } = new List<Progress>();
 }

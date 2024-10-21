@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Learning_World.Models;
 
 public partial class Course
 {
     public int CourseId { get; set; }
-
     public string Title { get; set; } = null!;
 
     public string? Description { get; set; }
+    public string? Image { get; set; }
 
     public string DifficultyLevel { get; set; } = null!;
+    public decimal Price { get; set; }
 
     public DateTime CreationDate { get; set; }
 
@@ -28,8 +30,6 @@ public partial class Course
     public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
 
     public virtual ICollection<Module> Modules { get; set; } = new List<Module>();
-
-    public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 
     public virtual ICollection<Category> Categories { get; set; } = new List<Category>();
 
