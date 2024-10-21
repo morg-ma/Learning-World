@@ -11,6 +11,8 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDistributedMemoryCache();
 
+builder.Services.AddScoped<LearnRepository, LearnRepository>();
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(20);
@@ -33,9 +35,6 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(
 
 builder.Services.AddDbContext<ElearningPlatformContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("connectionString")));
-
-builder.Services.AddScoped<LearnRepository, LearnRepository>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
