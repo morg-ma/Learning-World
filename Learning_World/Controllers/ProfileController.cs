@@ -25,38 +25,43 @@ namespace Learning_World.Controllers
             _context = context;
             _userManager = userManager;
         }
-        public async Task<IActionResult> View(int Id )
+        [Route("Profile/View")] // Explicitly defining the route without id
+        public async Task<IActionResult> View()
         {
-            // Retrieve the user from the UserManager
-            var user = await _userManager.FindByIdAsync(Id.ToString());
+            // Retrieve the UserId from cookies
+            var userIdCookie = Request.Cookies["UserId"];
+
+            if (string.IsNullOrEmpty(userIdCookie) || !int.TryParse(userIdCookie, out int userId))
+            {
+                return BadRequest("Invalid or missing UserId in cookies.");
+            }
+
+            // Retrieve the user from UserManager
+            var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null)
             {
                 return NotFound();
             }
 
-            // Retrieve the roles of the user
+            // Retrieve roles and user details as before
             var roles = await _userManager.GetRolesAsync(user);
-
-            // Retrieve the user's additional details (like Courses and Certificates)
             var dbUser = _context.Users
                 .Include(u => u.Courses)
                 .Include(u => u.Certificates)
                     .ThenInclude(c => c.Course)
-                .FirstOrDefault(u => u.Id == Id);
+                .FirstOrDefault(u => u.Id == userId);
 
             if (dbUser == null)
             {
                 return NotFound();
             }
 
-            // Construct the view model with user data
             var viewModel = new UserProfileViewModel
             {
                 Id = dbUser.Id,
                 Name = dbUser.UserName,
                 Email = dbUser.Email,
                 Image = dbUser.Image,
-                //RegistrationDate = dbUser.RegistrationDate, // Assuming you have this field in your User model
                 Roles = roles.ToList(),
                 Certificates = dbUser.Certificates.Select(c => new CertificateViewModel
                 {
@@ -69,13 +74,22 @@ namespace Learning_World.Controllers
             return View(viewModel);
         }
 
-        public async Task<IActionResult> Edit(int id)
+
+        public async Task<IActionResult> Edit()
         {
+            // Retrieve the UserId from cookies
+            var userIdCookie = Request.Cookies["UserId"];
+
+            if (string.IsNullOrEmpty(userIdCookie) || !int.TryParse(userIdCookie, out int userId))
+            {
+                return BadRequest("Invalid or missing UserId in cookies.");
+            }
+
+            // Retrieve the user based on the UserId from cookies
             var user = await _context.Users
-                //.Include(u => u.Roles)
                 .Include(u => u.Certificates)
                     .ThenInclude(c => c.Course)
-                .FirstOrDefaultAsync(e => e.Id == id);
+                .FirstOrDefaultAsync(e => e.Id == userId);
 
             if (user == null)
             {
@@ -88,8 +102,6 @@ namespace Learning_World.Controllers
                 Name = user.UserName,
                 Email = user.Email,
                 Image = user.Image,
-                //RegistrationDate = user.RegistrationDate,
-                //Roles = user.Roles.Select(r => r.RoleName).ToList(),
                 Certificates = user.Certificates.Select(c => new CertificateViewModel
                 {
                     CourseName = c.Course.Title,
@@ -99,16 +111,25 @@ namespace Learning_World.Controllers
 
             return View(viewModel);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SaveEdit(int id, UserProfileViewModel model)
+        public async Task<IActionResult> SaveEdit(UserProfileViewModel model)
         {
-            if (!ModelState.IsValid)
+            // Retrieve the UserId from cookies
+            var userIdCookie = Request.Cookies["UserId"];
+
+            if (string.IsNullOrEmpty(userIdCookie) || !int.TryParse(userIdCookie, out int userId))
             {
-                return View("Edit", model);
+                return BadRequest("Invalid or missing UserId in cookies.");
             }
 
-            var user = await _context.Users.FindAsync(id);
+            if (!ModelState.IsValid)
+            {
+                return View("Edit", model); // Return the Edit view if model state is invalid
+            }
+
+            var user = await _context.Users.FindAsync(userId); // Retrieve user based on UserId from cookies
             if (user == null)
             {
                 return NotFound();
@@ -118,7 +139,7 @@ namespace Learning_World.Controllers
             if (model.ImageFile != null)
             {
                 var imagePath = System.IO.Path.Combine(_hostingEnvironment.WebRootPath, "images");
-                Directory.CreateDirectory(imagePath); // Ensure directory exists
+                Directory.CreateDirectory(imagePath); // Ensure the directory exists
 
                 var uniqueFileName = Guid.NewGuid().ToString() + "_" + System.IO.Path.GetFileName(model.ImageFile.FileName);
                 var filePath = System.IO.Path.Combine(imagePath, uniqueFileName);
@@ -146,18 +167,20 @@ namespace Learning_World.Controllers
                     }
                 }
 
-                user.Image = uniqueFileName;
+                user.Image = uniqueFileName; // Update the user's image
             }
+
             // Update other user details
             user.UserName = model.Name;
             user.Email = model.Email;
+
             try
             {
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(); // Save changes to the database
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserExists(id))
+                if (!UserExists(userId))
                 {
                     return NotFound();
                 }
@@ -166,8 +189,10 @@ namespace Learning_World.Controllers
                     throw;
                 }
             }
-            return RedirectToAction("View", new { Id = user.Id });
+
+            return RedirectToAction("View"); // Redirect to the View action without ID in the route
         }
+
         private bool UserExists(int id)
         {
             return _context.Users.Any(e => e.Id == id);
