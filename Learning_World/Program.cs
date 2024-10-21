@@ -14,6 +14,7 @@ builder.Services.AddScoped<CoursesRepository, CoursesRepository>();
 builder.Services.AddScoped<MyLearningRepository, MyLearningRepository>();
 builder.Services.AddScoped<EnrollmentRepository, EnrollmentRepository>();
 builder.Services.AddScoped<UserProfileRepository>();
+builder.Services.AddScoped<LearnRepository, LearnRepository>();
 
 builder.Services.AddSession(options =>
 {
