@@ -1,6 +1,7 @@
 ﻿using Learning_World.Data;
 using Learning_World.Models;
 using Learning_World.ViewModels;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using System.Security.Claims;
 
 namespace Learning_World.Controllers
 {
@@ -18,12 +20,14 @@ namespace Learning_World.Controllers
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly ElearningPlatformContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> signInManager;
 
-        public ProfileController(IWebHostEnvironment hostingEnvironment, ElearningPlatformContext context, UserManager<User> userManager)
+        public ProfileController(IWebHostEnvironment hostingEnvironment, ElearningPlatformContext context, UserManager<User> userManager, SignInManager<User> signInManager)
         {
             _hostingEnvironment = hostingEnvironment;
             _context = context;
             _userManager = userManager;
+            this.signInManager = signInManager;
         }
         [Route("Profile/View")] // Explicitly defining the route without id
         public async Task<IActionResult> View()
@@ -40,7 +44,7 @@ namespace Learning_World.Controllers
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null)
             {
-                return NotFound();
+                return View("NotFound404");
             }
 
             // Retrieve roles and user details as before
@@ -53,7 +57,7 @@ namespace Learning_World.Controllers
 
             if (dbUser == null)
             {
-                return NotFound();
+                return View("NotFound404");
             }
 
             var viewModel = new UserProfileViewModel
@@ -93,7 +97,7 @@ namespace Learning_World.Controllers
 
             if (user == null)
             {
-                return NotFound();
+                return View("NotFound404");
             }
 
             var viewModel = new UserProfileViewModel
@@ -132,7 +136,7 @@ namespace Learning_World.Controllers
             var user = await _context.Users.FindAsync(userId); // Retrieve user based on UserId from cookies
             if (user == null)
             {
-                return NotFound();
+                return View("NotFound404");
             }
 
             // Handle image upload
@@ -161,7 +165,7 @@ namespace Learning_World.Controllers
                 if (!string.IsNullOrEmpty(user.Image))
                 {
                     var oldImagePath = System.IO.Path.Combine(imagePath, user.Image);
-                    if (System.IO.File.Exists(oldImagePath))
+                    if (System.IO.File.Exists(oldImagePath) && user.Image != "default.png")
                     {
                         System.IO.File.Delete(oldImagePath);
                     }
@@ -173,7 +177,7 @@ namespace Learning_World.Controllers
             // Update other user details
             user.UserName = model.Name;
             user.Email = model.Email;
-
+            await UpdateUserClaims(user, false);
             try
             {
                 await _context.SaveChangesAsync(); // Save changes to the database
@@ -182,7 +186,7 @@ namespace Learning_World.Controllers
             {
                 if (!UserExists(userId))
                 {
-                    return NotFound();
+                    return View("NotFound404");
                 }
                 else
                 {
@@ -190,7 +194,22 @@ namespace Learning_World.Controllers
                 }
             }
 
-            return RedirectToAction("View"); // Redirect to the View action without ID in the route
+            return RedirectToAction("Login", "Account"); // Redirect to the View action without ID in the route
+        }
+
+        // Helper method to update the user claims
+        private async Task UpdateUserClaims(User user, bool remember)
+        {
+            // Remove the existing identity
+            await signInManager.SignOutAsync();
+
+            // Create a new identity with updated claims
+            var claims = new List<Claim>
+    {
+        new Claim("Image", user.Image) // Add the image claim
+    };
+            // Re-sign in the user with the updated identity
+            await signInManager.SignInWithClaimsAsync(user, isPersistent: remember, claims);
         }
 
         private bool UserExists(int id)

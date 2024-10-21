@@ -84,7 +84,7 @@ namespace Learning_World.Controllers
                     return RedirectToAction("GetQuiz", new { lessonId = lessonId });
 
                 default:
-                    return NotFound();
+                    return View("NotFound404");
             }
 
         }
@@ -119,7 +119,7 @@ namespace Learning_World.Controllers
 
             if (quiz == null)
             {
-                return NotFound();
+                return View("NotFound404");
             }
 
             int correctAnswers = 0;

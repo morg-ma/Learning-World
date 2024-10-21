@@ -36,7 +36,8 @@ namespace Learning_World.Controllers
                 User applicationUser = new User()
                 {
                     UserName = user.UserName,
-                    Email = user.Email
+                    Email = user.Email,
+                    Image = "default.jpg"
                 };
                 // add userpassword for hashing
                 IdentityResult result = await _UserManager.CreateAsync(applicationUser, user.Password);
@@ -46,7 +47,9 @@ namespace Learning_World.Controllers
                     //  await _UserManager.AddToRoleAsync(applicationUser, "user");
                     // cookie  
                     await _UserManager.AddToRoleAsync(applicationUser, "student");//to make any one student
-                    await _SignInManager.SignInAsync(applicationUser, false);
+                    await _SignInManager.SignInWithClaimsAsync(applicationUser, false, new List<Claim>() {
+                            new("Image",applicationUser.Image)
+                        });
                     Response.Cookies.Append("UserId", applicationUser.Id.ToString());// to Add Id in cookies
 
                     return RedirectToAction("Index", "Main");
@@ -61,6 +64,10 @@ namespace Learning_World.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Main");
+            }
             return View();
         }
         [HttpPost]
@@ -76,7 +83,11 @@ namespace Learning_World.Controllers
                     bool exsist = await _UserManager.CheckPasswordAsync(AppUser, user.Password);
                     if (exsist)
                     {
-                        await _SignInManager.SignInAsync(AppUser, user.Remember);
+                        await _SignInManager.SignInWithClaimsAsync(AppUser, user.Remember, new List<Claim>() {
+                            new("Image",AppUser.Image)
+                        });
+                        //ViewBag.Image = User.Claims.FirstOrDefault(claim => claim.Type == "Image") == null ? "default.png" : User.Claims.FirstOrDefault(claim => claim.Type == "Image").Value;
+                        //ViewBag.Image = AppUser.Image;
                         //await SignInManager.SignInAsync(AppUser,user.RememberME,);
                         // TempData["success"] = $"LogIn successfuly\nwelcome {AppUser.UserName}";
                         Response.Cookies.Append("UserId", AppUser.Id.ToString());// to Add Id in cookies

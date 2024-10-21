@@ -7,7 +7,7 @@
 <body class="bg-light">
     <header class="bg-primary text-white py-5">
         <div class="container">
-            <h1 class="display-4 fw-bold">@Model.Title</h1>
+            <h1 class="display-4 fw-bold text-light">@Model.Title</h1>
             @foreach (var item in Model.Users)
             {
                 <p class="lead">Instructor: </p>
@@ -154,7 +154,7 @@
             </div>
         </div>
     </div>
-
+    <partial name="_FooterPartial" />
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function () {
             var modules = document.querySelectorAll('.collapse');

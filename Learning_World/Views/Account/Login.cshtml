@@ -27,11 +27,13 @@
                                     <div data-mdb-input-init class="form-outline mb-4">
                                         <label class="form-label" asp-for="Name">Username</label>
                                         <input asp-for="Name" class="form-control form-control-lg" />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
                                     </div>
 
                                     <div data-mdb-input-init class="form-outline mb-4">
                                         <label class="form-label" asp-for="Password">Password</label>
                                         <input type="password" asp-for="Password" class="form-control form-control-lg" />
+                                        <span asp-validation-for="Password" class="text-danger"></span>
                                     </div>
                                     
                                     <div class="form-check">

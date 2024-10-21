@@ -22,7 +22,7 @@ namespace Learning_World.Controllers
 			Course course = _context.Courses.Include(e => e.Users).FirstOrDefault(e => e.CourseId == courseId);
 			if (course == null)
 			{
-				return NotFound();
+				return View("NotFound404");
 			}
 			ViewBag.modules = _context.Modules.Where(e => e.CourseId == courseId).ToList();
 			ViewBag.parts = _context.Parts.ToList();
@@ -42,7 +42,7 @@ namespace Learning_World.Controllers
 		{
 			var course = _context.Courses.FirstOrDefault(c => c.CourseId == courseId);
 			if (course == null)
-				return NotFound();
+				return View("NotFound404");
 
 			var userRegistration = new UserRegistrationViewModel();
 			userRegistration.CourseId = course.CourseId;
