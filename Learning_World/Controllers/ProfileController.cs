@@ -166,7 +166,7 @@ namespace Learning_World.Controllers
                     throw;
                 }
             }
-            return RedirectToAction("View", new { UserId = user.Id });
+            return RedirectToAction("View", new { Id = user.Id });
         }
         private bool UserExists(int id)
         {
