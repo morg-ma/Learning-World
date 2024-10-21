@@ -25,10 +25,10 @@ builder.Services.AddSession(options =>
 builder.Services.AddIdentity<User, IdentityRole<int>>(
                options =>
                {
-                   options.Password.RequireDigit = false;
-                   options.Password.RequireLowercase = false;
-                   options.Password.RequireUppercase = false;
-                   options.Password.RequireNonAlphanumeric = false;
+                   options.Password.RequireDigit = true;
+                   options.Password.RequireLowercase = true;
+                   options.Password.RequireUppercase = true;
+                   options.Password.RequireNonAlphanumeric = true;
                    options.Password.RequiredLength = 4;
                }
                ).AddEntityFrameworkStores<ElearningPlatformContext>()
