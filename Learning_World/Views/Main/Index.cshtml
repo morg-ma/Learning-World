@@ -187,7 +187,7 @@
                 <div class="col-lg-4 col-md-6 wow fadeInUp mt-3" data-wow-delay="0.@(i)s">
                     <div class="course-item bg-light">
                         <div class="position-relative overflow-hidden">
-                            <img class="img-fluid" src="~/assets/Images/Courses/@Model[i].Image" alt="Full-Stack Web Development">
+                            <img src="~/assets/Images/Courses/@Model[i].Image" width="500" height="300" style="object-fit: cover; max-width: 100%;" alt="Full-Stack Web Development">
                             <div class="w-100 d-flex justify-content-center position-absolute bottom-0 start-0 mb-4">
                                 <a asp-controller="CourseDetails" asp-action="ShowCourse" asp-route-courseId="@Model[i].CourseId" class="flex-shrink-0 btn btn-sm btn-primary px-3" style="border-radius: 30px;">Go to Course</a>
                             </div>

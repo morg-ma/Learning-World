@@ -15,7 +15,7 @@
             <input type="hidden" asp-for="CourseName" />
             <input type="hidden" asp-for="CoursePrice" />
             <!-- Hidden field to store username from cookies -->
-            <input type="hidden" id="cookieUserName" value="@Context.Request.Cookies["UserName"]" />
+            <input type="hidden" id="cookieUserName" value="@User.Identity.Name" />
 
             <div class="mb-3">
                 <label asp-for="UserName" class="form-label"></label>
