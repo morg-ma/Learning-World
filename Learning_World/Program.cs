@@ -7,7 +7,13 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddScoped<CoursesRepository, CoursesRepository>();
+builder.Services.AddScoped<MyLearningRepository, MyLearningRepository>();
+builder.Services.AddScoped<EnrollmentRepository, EnrollmentRepository>();
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(20);
