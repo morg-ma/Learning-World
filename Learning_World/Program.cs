@@ -4,9 +4,7 @@ using Learning_World.Models;
 using Learning_World.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -22,8 +20,6 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-
-
 builder.Services.AddIdentity<User, IdentityRole<int>>(
                options =>
                {
@@ -38,10 +34,8 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(
 
 builder.Services.AddDbContext<ElearningPlatformContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("connectionString")));
-
-
+builder.Services.AddScoped<UserProfileRepository>();
 var app = builder.Build();
-
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

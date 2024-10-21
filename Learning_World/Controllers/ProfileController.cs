@@ -1,87 +1,52 @@
 ﻿using System.Security.Claims;
-using Learning_World.Data;
 using Learning_World.Models;
 using Learning_World.ViewModels;
+using Learning_World.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 
 namespace Learning_World.Controllers
 {
     [Authorize]
     public class ProfileController : Controller
     {
-        private readonly IWebHostEnvironment _hostingEnvironment;
-        private readonly ElearningPlatformContext _context;
+        private readonly UserProfileRepository _userRepository;
         private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> signInManager;
+        private readonly SignInManager<User> _signInManager;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public ProfileController(IWebHostEnvironment hostingEnvironment, ElearningPlatformContext context, UserManager<User> userManager, SignInManager<User> signInManager)
+        public ProfileController(UserProfileRepository userRepository, UserManager<User> userManager, SignInManager<User> signInManager, IWebHostEnvironment hostingEnvironment)
         {
-            _hostingEnvironment = hostingEnvironment;
-            _context = context;
+            _userRepository = userRepository;
             _userManager = userManager;
-            this.signInManager = signInManager;
+            _signInManager = signInManager;
+            _hostingEnvironment = hostingEnvironment;
         }
+
         [Route("Profile/Show")]
         public async Task<IActionResult> Show()
         {
             int userId = int.Parse(User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
+            var viewModel = await _userRepository.GetUserProfile(userId);
 
-            var dbUser = _context.Users
-                .Include(u => u.Courses)
-                .Include(u => u.Certificates)
-                    .ThenInclude(c => c.Course)
-                .FirstOrDefault(u => u.Id == userId);
-
-
-            var viewModel = new UserProfileViewModel
+            if (viewModel == null)
             {
-                Id = dbUser.Id,
-                Name = dbUser.UserName,
-                Email = dbUser.Email,
-                Image = dbUser.Image,
-                Certificates = dbUser.Certificates.Select(c => new CertificateViewModel
-                {
-                    CourseName = c.Course.Title,
-                    IssueDate = c.IssueDate
-                }).ToList()
-            };
+                return NotFound();
+            }
 
             return View(viewModel);
         }
 
-
         public async Task<IActionResult> Edit()
         {
-
             int userId = int.Parse(User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
+            var viewModel = await _userRepository.GetUserProfile(userId);
 
-            var user = await _context.Users
-                .Include(u => u.Certificates)
-                    .ThenInclude(c => c.Course)
-                .FirstOrDefaultAsync(e => e.Id == userId);
-
-
-            var viewModel = new UserProfileViewModel
+            if (viewModel == null)
             {
-                Id = user.Id,
-                Name = user.UserName,
-                Email = user.Email,
-                Image = user.Image,
-                Certificates = user.Certificates.Select(c => new CertificateViewModel
-                {
-                    CourseName = c.Course.Title,
-                    IssueDate = c.IssueDate
-                }).ToList()
-            };
+                return NotFound();
+            }
 
             return View(viewModel);
         }
@@ -90,123 +55,44 @@ namespace Learning_World.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveEdit(UserProfileViewModel model)
         {
-            int userId = int.Parse(User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
-
-
             if (!ModelState.IsValid)
             {
-                return View("Edit", model); // Return the Edit view if model state is invalid
+                return View("Edit", model);
             }
 
-            var user = await _context.Users.FindAsync(userId); // Retrieve user based on UserId from cookies
+            int userId = int.Parse(User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
+            var user = await _userRepository.GetUserById(userId);
 
-            // Handle image upload
-            if (model.ImageFile != null)
+            if (user == null)
             {
-                var imagePath = System.IO.Path.Combine(_hostingEnvironment.WebRootPath, "images");
-                Directory.CreateDirectory(imagePath); // Ensure the directory exists
-
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + System.IO.Path.GetFileName(model.ImageFile.FileName);
-                var filePath = System.IO.Path.Combine(imagePath, uniqueFileName);
-
-                using (var image = Image.Load(model.ImageFile.OpenReadStream()))
-                {
-                    image.Mutate(x => x
-                        .Resize(new ResizeOptions
-                        {
-                            Size = new Size(230, 230),  // Resize to 230x230 pixels
-                            Mode = ResizeMode.Crop      // Crop to ensure the image fits exactly
-                        })
-                        .ApplyRoundedCorners(115)       // Apply circular crop with a radius of 115 (half of 230)
-                    );
-
-                    await image.SaveAsync(filePath, new PngEncoder());
-                }
-                // Delete the old image if it exists
-                if (!string.IsNullOrEmpty(user.Image))
-                {
-                    var oldImagePath = System.IO.Path.Combine(imagePath, user.Image);
-                    if (System.IO.File.Exists(oldImagePath) && user.Image != "default.png")
-                    {
-                        System.IO.File.Delete(oldImagePath);
-                    }
-                }
-
-                user.Image = uniqueFileName; // Update the user's image
+                return NotFound();
             }
 
-            // Update other user details
             user.UserName = model.Name;
             user.Email = model.Email;
-            await UpdateUserClaims(user, false);
-            try
+
+            bool updateResult = await _userRepository.UpdateUser(user, model.ImageFile, _hostingEnvironment.WebRootPath);
+
+            if (!updateResult)
             {
-                await _context.SaveChangesAsync(); // Save changes to the database
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(userId))
-                {
-                    return View("NotFound404");
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound();
             }
 
-            return RedirectToAction("Login", "Account"); // Redirect to the View action without ID in the route
+            await UpdateUserClaims(user, false);
+
+            return RedirectToAction("Login", "Account");
         }
 
-        // Helper method to update the user claims
         private async Task UpdateUserClaims(User user, bool remember)
         {
-            // Remove the existing identity
-            await signInManager.SignOutAsync();
+            await _signInManager.SignOutAsync();
 
-            // Create a new identity with updated claims
             var claims = new List<Claim>
-    {
-        new Claim("Image", user.Image) // Add the image claim
-    };
-            // Re-sign in the user with the updated identity
-            await signInManager.SignInWithClaimsAsync(user, isPersistent: remember, claims);
-        }
-
-        private bool UserExists(int id)
-        {
-            return _context.Users.Any(e => e.Id == id);
-        }
-    }
-    public static class ImageProcessingExtensions
-    {
-        public static IImageProcessingContext ApplyRoundedCorners(this IImageProcessingContext ctx, float cornerRadius)
-        {
-            Size size = ctx.GetCurrentSize();
-            IPathCollection corners = BuildCorners(size.Width, size.Height, cornerRadius);
-            ctx.SetGraphicsOptions(new GraphicsOptions()
             {
-                Antialias = true,
-                AlphaCompositionMode = PixelAlphaCompositionMode.DestOut
-            });
-            foreach (var c in corners)
-            {
-                ctx = ctx.Fill(Color.Red, c);
-            }
-            return ctx;
-        }
-        private static IPathCollection BuildCorners(int imageWidth, int imageHeight, float cornerRadius)
-        {
-            // Create a square
-            var rect = new RectangularPolygon(-0.5f, -0.5f, cornerRadius, cornerRadius);
-            // then cut out of the square a circle so we are left with a corner
-            IPath cornerTopLeft = rect.Clip(new EllipsePolygon(cornerRadius - 0.5f, cornerRadius - 0.5f, cornerRadius));
-            // corner is now a corner shape positions top left
-            var cornerTopRight = cornerTopLeft.RotateDegree(90).Translate(imageWidth - cornerRadius, 0);
-            var cornerBottomLeft = cornerTopLeft.RotateDegree(-90).Translate(0, imageHeight - cornerRadius);
-            var cornerBottomRight = cornerTopLeft.RotateDegree(180).Translate(imageWidth - cornerRadius, imageHeight - cornerRadius);
+                new Claim("Image", user.Image)
+            };
 
-            return new PathCollection(cornerTopLeft, cornerTopRight, cornerBottomLeft, cornerBottomRight);
+            await _signInManager.SignInWithClaimsAsync(user, isPersistent: remember, claims);
         }
     }
 }
