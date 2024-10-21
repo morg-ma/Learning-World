@@ -37,13 +37,14 @@ namespace Learning_World.Controllers
             return View(modules);
         }
 
-
+     
         public IActionResult PartsPartialView(int id)
         {
             var partsWithLessons = _learnRepository.GetPartByModuleId(id).ToList();
             return PartialView(partsWithLessons);
 
         }
+        [LessonsAuthorizationFilter]
         [Route("Learn/lesson/{moduleId?}/{lessonType}/{lessonId}")]
 
         public IActionResult Lessons(int moduleId, int lessonId)
@@ -56,7 +57,6 @@ namespace Learning_World.Controllers
             ViewBag.ModuleName = partsWithLessons[0].Module.Title;
             return View(partsWithLessons);
         }
-
 
 
         [Route("Learn/LessonDisplayPartialView/{moduleId?}/{lessonType}/{lessonId}")]

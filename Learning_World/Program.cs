@@ -36,6 +36,9 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(
 
 builder.Services.AddDbContext<ElearningPlatformContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("connectionString")));
+
+builder.Services.AddScoped<LearnRepository, LearnRepository>();
+
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
