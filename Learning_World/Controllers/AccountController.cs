@@ -50,7 +50,6 @@ namespace Learning_World.Controllers
                     await _SignInManager.SignInWithClaimsAsync(applicationUser, false, new List<Claim>() {
                             new("Image",applicationUser.Image)
                         });
-                    Response.Cookies.Append("UserId", applicationUser.Id.ToString());// to Add Id in cookies
 
                     return RedirectToAction("Index", "Main");
                 }
@@ -86,11 +85,7 @@ namespace Learning_World.Controllers
                         await _SignInManager.SignInWithClaimsAsync(AppUser, user.Remember, new List<Claim>() {
                             new("Image",AppUser.Image)
                         });
-                        //ViewBag.Image = User.Claims.FirstOrDefault(claim => claim.Type == "Image") == null ? "default.png" : User.Claims.FirstOrDefault(claim => claim.Type == "Image").Value;
-                        //ViewBag.Image = AppUser.Image;
-                        //await SignInManager.SignInAsync(AppUser,user.RememberME,);
-                        // TempData["success"] = $"LogIn successfuly\nwelcome {AppUser.UserName}";
-                        Response.Cookies.Append("UserId", AppUser.Id.ToString());// to Add Id in cookies
+                      
                         return RedirectToAction("Index", "Main");
                     }
                     ModelState.AddModelError("Password", "password is incorrect");
