@@ -106,22 +106,23 @@
         document.getElementById("creditCardFields").style.display = "none";
 
         function validateForm() {
-            const isUserNameValid = validateUserName();
+            // const isUserNameValid = validateUserName();
             const isCardInfoValid = validateCardInfo();
-            return isUserNameValid && isCardInfoValid; // Return true only if all validations pass
+            // return isUserNameValid && isCardInfoValid; // Return true only if all validations pass
+            return isCardInfoValid; // Return true only if all validations pass
         }
 
-        function validateUserName() {
-            const enteredUserName = document.getElementById('UserName').value;
-            const cookieUserName = document.getElementById('cookieUserName').value;
+        // function validateUserName() {
+        //     const enteredUserName = document.getElementById('UserName').value;
+        //     const cookieUserName = document.getElementById('cookieUserName').value;
 
-            if (enteredUserName !== cookieUserName) {
-                alert("The username does not match the one stored in cookies. Please check your input.");
-                return false; // Prevent form submission
-            }
+        //     if (enteredUserName !== cookieUserName) {
+        //         alert("The username does not match the one stored in cookies. Please check your input.");
+        //         return false; // Prevent form submission
+        //     }
 
-            return true; // Allow form submission
-        }
+        //     return true; // Allow form submission
+        // }
 
         function validateCardInfo() {
             const cardNumber = document.getElementById('CardNumber').value.replace(/\s+/g, ''); // Remove spaces

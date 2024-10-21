@@ -2,6 +2,7 @@ using System;
 using Learning_World.Data;
 using Learning_World.Models;
 using Learning_World.Repositories;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
@@ -40,11 +41,11 @@ builder.Services.AddDbContext<ElearningPlatformContext>(options =>
 builder.Services.AddScoped<LearnRepository, LearnRepository>();
 
 var app = builder.Build();
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-}
+
+app.UseExceptionHandler("/Home/Error");
+
+app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
+
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -75,7 +76,7 @@ app.UseEndpoints(endpoints =>
     _ = endpoints.MapControllerRoute(
         name: "lessonDisplayPartial",
         pattern: "Learn/lesson/{moduleId}/{lessonType}/{lessonId}",
-        defaults: new { controller = "Learn", action = "LessonsPartialView" });       
+        defaults: new { controller = "Learn", action = "LessonsPartialView" });
 });
 
 app.Run();
