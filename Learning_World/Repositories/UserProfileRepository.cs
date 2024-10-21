@@ -82,7 +82,7 @@ namespace Learning_World.Repositories
                 if (!string.IsNullOrEmpty(user.Image))
                 {
                     var oldImagePath = System.IO.Path.Combine(imagePath, user.Image);
-                    if (File.Exists(oldImagePath) && user.Image != "default.png")
+                    if (File.Exists(oldImagePath) && user.Image != "default.jpg")
                     {
                         File.Delete(oldImagePath);
                     }
