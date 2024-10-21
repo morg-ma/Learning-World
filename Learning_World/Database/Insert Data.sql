@@ -215,12 +215,8 @@ INSERT INTO QuizAnswers (QuestionID, AnswerText, IsCorrect) VALUES
 INSERT INTO Modules (CourseID, Title, Description, OrderInCourse) VALUES
 (2, 'Advanced Data Analysis', 'Advanced techniques for data analysis in R', 3),
 (2, 'Statistical Modeling in R', 'Introduction to statistical modeling using R', 4),
-(3, 'Email Marketing', 'Effective email marketing strategies', 3),
-(3, 'Search Engine Optimization', 'Basics of SEO for digital marketing', 4),
-(4, 'User Research', 'Techniques for conducting user research', 3),
-(4, 'Visual Design Principles', 'Fundamentals of visual design for UI/UX', 4),
-(5, 'Basic Spanish Grammar', 'Introduction to Spanish grammar rules', 3),
-(5, 'Spanish Vocabulary Building', 'Expanding your Spanish vocabulary', 4);
+(3, 'Email Marketing', 'Effective email marketing strategies', 3);
+
 
 -- Insert parts for new modules
 INSERT INTO Parts (ModuleID, Title, Description, OrderInModule) VALUES
@@ -229,17 +225,7 @@ INSERT INTO Parts (ModuleID, Title, Description, OrderInModule) VALUES
 (12, 'Linear Regression in R', 'Understanding and implementing linear regression', 1),
 (12, 'Logistic Regression in R', 'Basics of logistic regression modeling', 2),
 (13, 'Email Campaign Planning', 'Strategies for planning effective email campaigns', 1),
-(13, 'Email Analytics and Optimization', 'Analyzing and improving email performance', 2),
-(14, 'Keyword Research', 'Techniques for effective keyword research', 1),
-(14, 'On-Page SEO', 'Optimizing web pages for search engines', 2),
-(15, 'User Interviews', 'Conducting effective user interviews', 1),
-(15, 'Usability Testing', 'Methods for usability testing in UI/UX design', 2),
-(16, 'Color Theory in Design', 'Understanding and applying color theory', 1),
-(16, 'Typography in UI/UX', 'Effective use of typography in design', 2),
-(17, 'Spanish Nouns and Articles', 'Understanding Spanish nouns and articles', 1),
-(17, 'Spanish Verb Conjugations', 'Basic Spanish verb conjugations', 2),
-(18, 'Everyday Spanish Words', 'Common words used in daily Spanish conversations', 1),
-(18, 'Spanish Phrases for Travelers', 'Useful phrases for Spanish-speaking countries', 2);
+(13, 'Email Analytics and Optimization', 'Analyzing and improving email performance', 2);
 
 -- Insert lessons for new parts
 INSERT INTO Lessons (PartID, LessonTypeID, Title, Description, OrderInPart) VALUES
@@ -375,6 +361,22 @@ INSERT INTO QuizQuestions (LessonID, QuestionText) VALUES
 
 -- Insert quiz answers for new questions
 INSERT INTO QuizAnswers (QuestionID, AnswerText, IsCorrect) VALUES
+(1, 'var x = 5', 0),
+(1, 'x = 5', 1),
+(1, 'int x = 5', 0),
+(1, 'let x = 5', 0),
+(2, 'Integer', 0),
+(2, 'Float', 0),
+(2, 'String', 0),
+(2, 'Char', 1),
+(3, 'To execute when the if condition is true', 0),
+(3, 'To execute when the if condition is false', 1),
+(3, 'To execute regardless of the if condition', 0),
+(3, 'To end the if statement', 0),
+(4, 'Once', 0),
+(4, 'Ten times', 0),
+(4, 'Infinitely', 1),
+(4, 'It depends on the condition inside the loop', 0),
 (21, 'na.omit()', 1),
 (21, 'remove.na()', 0),
 (21, 'delete.missing()', 0),
