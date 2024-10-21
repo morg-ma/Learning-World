@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Learning_World.Data;
 using Learning_World.Models;
+using Learning_World.Repositories;
 using Learning_World.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,29 +10,32 @@ namespace Learning_World.Controllers
 {
 	public class CourseDetailsController : Controller
 	{
-		private readonly ElearningPlatformContext _context;
-		public CourseDetailsController(ElearningPlatformContext elearningPlatform)
+        private readonly EnrollmentRepository _enrollmentRepository;
+        private readonly CoursesRepository _coursesRepository;
+
+        public CourseDetailsController(EnrollmentRepository enrollmentRepository, CoursesRepository coursesRepository)
 		{
-			_context = elearningPlatform;
-		}
+            _enrollmentRepository = enrollmentRepository;
+            _coursesRepository = coursesRepository;
+        }
 
 		[Route("Courses/view/{courseId}")]
 
 		public IActionResult ShowCourse(int courseId = 1)
 		{
-			Course course = _context.Courses.Include(e => e.Users).FirstOrDefault(e => e.CourseId == courseId);
+			Course course = _coursesRepository.GetById(courseId);
 			if (course == null)
 			{
 				return View("NotFound404");
 			}
-			ViewBag.modules = _context.Modules.Where(e => e.CourseId == courseId).ToList();
-			ViewBag.parts = _context.Parts.ToList();
-			ViewBag.lessons = _context.Lessons.ToList();
+			ViewBag.modules = _coursesRepository.GetCourseModules(courseId);
+			ViewBag.parts = _coursesRepository.GetCourseParts();
+			ViewBag.lessons = _coursesRepository.GetCourseLessons();
 			ViewBag.IsEnrolled = false;
 			if (User.Identity.IsAuthenticated)
 			{
 			int userId = int.Parse(User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value);
-			ViewBag.IsEnrolled = _context.Enrollments.FirstOrDefault(e => e.CourseId == courseId &&e.UserId == userId) == null ? false : true;
+			ViewBag.IsEnrolled = _enrollmentRepository.IsEnrolled(courseId, userId);
 			}
 			return View(course);
 		}
@@ -40,7 +44,7 @@ namespace Learning_World.Controllers
 		[HttpGet]
 		public IActionResult Enroll(int courseId)
 		{
-			var course = _context.Courses.FirstOrDefault(c => c.CourseId == courseId);
+			var course = _coursesRepository.GetById(courseId);
 			if (course == null)
 				return View("NotFound404");
 
@@ -79,12 +83,9 @@ namespace Learning_World.Controllers
 					Payment = CreditPayment
 				};
 
-				_context.Payments.Add(CreditPayment);
-				_context.Enrollments.Add(enrollment);
-				_context.SaveChanges();
+				_enrollmentRepository.AddEnroll(enrollment, CreditPayment);
+				_enrollmentRepository.Save();
 
-
-				
 				return RedirectToAction("Index", "MyLearning");
 				// return RedirectToAction("CourseView", new {courseId = model.Course.CourseId, userId = model.UserId});
 			}

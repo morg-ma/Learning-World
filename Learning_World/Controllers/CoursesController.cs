@@ -2,16 +2,17 @@
 using Learning_World.Data;
 using Learning_World.Extentions;
 using Learning_World.Models;
+using Learning_World.Repositories;
 using Learning_World.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 public class CoursesController : Controller
 {
-    private readonly ElearningPlatformContext _context;
+    private readonly CoursesRepository _coursesRepository;
 
-    public CoursesController(ElearningPlatformContext context)
+    public CoursesController(CoursesRepository coursesRepository)
     {
-        _context = context;
+        _coursesRepository = coursesRepository;
     }
 
     public IActionResult Index()
@@ -20,7 +21,7 @@ public class CoursesController : Controller
     }
     public async Task<IActionResult> CoursesOverView(List<string> Levels, List<string> Prices, List<string> Rates, string sortOrder = "MostPopular", string search = "", int pageNo = 1)
     {
-        var courseVM = await Courses_VM_Mapper(_context.Courses, Levels, Prices, Rates, sortOrder, search, pageNo);
+        var courseVM = await Courses_VM_Mapper(_coursesRepository.GetAllCourses(), Levels, Prices, Rates, sortOrder, search, pageNo);
 
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
         {

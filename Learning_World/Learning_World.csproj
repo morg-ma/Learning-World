@@ -12,7 +12,6 @@
     <Folder Include="Validators\" />
     <Folder Include="Mappers\" />
     <Folder Include="Services\" />
-    <Folder Include="Repositories\" />
   </ItemGroup>
 
   <ItemGroup>

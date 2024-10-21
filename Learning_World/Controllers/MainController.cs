@@ -1,19 +1,20 @@
 ﻿using Learning_World.Data;
+using Learning_World.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Learning_World.Controllers
 {
     public class MainController : Controller
     {
-        private readonly ElearningPlatformContext _context;
+        private readonly CoursesRepository _coursesRepository;
 
-        public MainController(ElearningPlatformContext context)
+        public MainController(CoursesRepository coursesRepository)
         {
-            _context = context;
+            _coursesRepository = coursesRepository;
         }
         public IActionResult Index()
         {
-            var topCourses = _context.Courses.OrderByDescending(c => c.MaxEnrollment).Take(3).ToList();
+            var topCourses = _coursesRepository.GetMostPopularCourses(3);
             return View(topCourses);
         }
 

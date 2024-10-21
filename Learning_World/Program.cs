@@ -1,6 +1,7 @@
 using System;
 using Learning_World.Data;
 using Learning_World.Models;
+using Learning_World.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddScoped<CoursesRepository, CoursesRepository>();
+builder.Services.AddScoped<MyLearningRepository, MyLearningRepository>();
+builder.Services.AddScoped<EnrollmentRepository, EnrollmentRepository>();
 
 builder.Services.AddSession(options =>
 {
