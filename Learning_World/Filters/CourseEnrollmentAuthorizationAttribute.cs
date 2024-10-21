@@ -5,7 +5,7 @@ using System.Security.Claims;
 
 namespace Learning_World.Filters
 {
-        
+
 
     public class CourseEnrollmentAuthorizationAttribute : TypeFilterAttribute
     {
