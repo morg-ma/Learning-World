@@ -1,7 +1,8 @@
-﻿using Learning_World.Data;
+﻿using System.Security.Claims;
+using Learning_World.Data;
 using Learning_World.Models;
 using Learning_World.ViewModels;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +12,10 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using System.Security.Claims;
 
 namespace Learning_World.Controllers
 {
+    [Authorize]
     public class ProfileController : Controller
     {
         private readonly IWebHostEnvironment _hostingEnvironment;
@@ -29,36 +30,17 @@ namespace Learning_World.Controllers
             _userManager = userManager;
             this.signInManager = signInManager;
         }
-        [Route("Profile/View")] // Explicitly defining the route without id
-        public async Task<IActionResult> View()
+        [Route("Profile/Show")]
+        public async Task<IActionResult> Show()
         {
-            // Retrieve the UserId from cookies
-            var userIdCookie = Request.Cookies["UserId"];
+            int userId = int.Parse(User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
 
-            if (string.IsNullOrEmpty(userIdCookie) || !int.TryParse(userIdCookie, out int userId))
-            {
-                return BadRequest("Invalid or missing UserId in cookies.");
-            }
-
-            // Retrieve the user from UserManager
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user == null)
-            {
-                return View("NotFound404");
-            }
-
-            // Retrieve roles and user details as before
-            var roles = await _userManager.GetRolesAsync(user);
             var dbUser = _context.Users
                 .Include(u => u.Courses)
                 .Include(u => u.Certificates)
                     .ThenInclude(c => c.Course)
                 .FirstOrDefault(u => u.Id == userId);
 
-            if (dbUser == null)
-            {
-                return View("NotFound404");
-            }
 
             var viewModel = new UserProfileViewModel
             {
@@ -66,7 +48,6 @@ namespace Learning_World.Controllers
                 Name = dbUser.UserName,
                 Email = dbUser.Email,
                 Image = dbUser.Image,
-                Roles = roles.ToList(),
                 Certificates = dbUser.Certificates.Select(c => new CertificateViewModel
                 {
                     CourseName = c.Course.Title,
@@ -74,31 +55,20 @@ namespace Learning_World.Controllers
                 }).ToList()
             };
 
-            // Return the View with the view model
             return View(viewModel);
         }
 
 
         public async Task<IActionResult> Edit()
         {
-            // Retrieve the UserId from cookies
-            var userIdCookie = Request.Cookies["UserId"];
 
-            if (string.IsNullOrEmpty(userIdCookie) || !int.TryParse(userIdCookie, out int userId))
-            {
-                return BadRequest("Invalid or missing UserId in cookies.");
-            }
+            int userId = int.Parse(User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
 
-            // Retrieve the user based on the UserId from cookies
             var user = await _context.Users
                 .Include(u => u.Certificates)
                     .ThenInclude(c => c.Course)
                 .FirstOrDefaultAsync(e => e.Id == userId);
 
-            if (user == null)
-            {
-                return View("NotFound404");
-            }
 
             var viewModel = new UserProfileViewModel
             {
@@ -120,13 +90,8 @@ namespace Learning_World.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveEdit(UserProfileViewModel model)
         {
-            // Retrieve the UserId from cookies
-            var userIdCookie = Request.Cookies["UserId"];
+            int userId = int.Parse(User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
 
-            if (string.IsNullOrEmpty(userIdCookie) || !int.TryParse(userIdCookie, out int userId))
-            {
-                return BadRequest("Invalid or missing UserId in cookies.");
-            }
 
             if (!ModelState.IsValid)
             {
@@ -134,10 +99,6 @@ namespace Learning_World.Controllers
             }
 
             var user = await _context.Users.FindAsync(userId); // Retrieve user based on UserId from cookies
-            if (user == null)
-            {
-                return View("NotFound404");
-            }
 
             // Handle image upload
             if (model.ImageFile != null)
