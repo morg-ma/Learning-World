@@ -13,6 +13,7 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddScoped<CoursesRepository, CoursesRepository>();
 builder.Services.AddScoped<MyLearningRepository, MyLearningRepository>();
 builder.Services.AddScoped<EnrollmentRepository, EnrollmentRepository>();
+builder.Services.AddScoped<UserProfileRepository>();
 
 builder.Services.AddSession(options =>
 {
@@ -34,7 +35,7 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(
 
 builder.Services.AddDbContext<ElearningPlatformContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("connectionString")));
-builder.Services.AddScoped<UserProfileRepository>();
+
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
