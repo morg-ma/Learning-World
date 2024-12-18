@@ -87,16 +87,16 @@ We welcome contributions to Learning World! To get started:
 
 ## 🔹 Screenshots
 
-![Register Page](https://drive.google.com/file/d/1gyeVvPKfuCSgGyZ2TrxfoFBQh8SrRPbj)
-![Login Page](https://drive.google.com/file/d/1KV3JFyV8f2Xyu5SxYSOan5PtjX9i1kfj)
-![Profile Page](https://drive.google.com/file/d/1tcp81dFaNVbEG-lzpHJOnRYfufQWHdp5)
-![Update User Details](https://drive.google.com/file/d/1r2EdnyX2EBEN8zDDizM-3vC0C_EImn_l)
-![Courses Overview](https://drive.google.com/file/d/1Cel4PqqRnEy9727Dx5Q3XMLUZhExOpYO)
-![Course Details](https://drive.google.com/file/d/1Fxilkc2WD-_jtwfkqvaDzH9Jira_NfD8)
-![Enroll Page](https://drive.google.com/file/d/1rxYDljEaPsUvcBDzrTAjkuyw7Nb6GQFR)
-![MyLearning Page](https://drive.google.com/file/d/18schOAY-LOWKzLKtDiFtktfkEFqbU3ba)
-![Course Page](https://drive.google.com/file/d/1RoFlFYLKdAZUCopMU5bXuVdi7qp4yVAX)
-![Module Page](https://drive.google.com/file/d/1tz6vXHGASDgj5lQxdnqUEgJBOF1-od13)
+![Register Page](https://drive.google.com/uc?id=1gyeVvPKfuCSgGyZ2TrxfoFBQh8SrRPbj)
+![Login Page](https://drive.google.com/uc?id=1KV3JFyV8f2Xyu5SxYSOan5PtjX9i1kfj)
+![Profile Page](https://drive.google.com/uc?id=1tcp81dFaNVbEG-lzpHJOnRYfufQWHdp5)
+![Update User Details](https://drive.google.com/uc?id=1r2EdnyX2EBEN8zDDizM-3vC0C_EImn_l)
+![Courses Overview](https://drive.google.com/uc?id=1Cel4PqqRnEy9727Dx5Q3XMLUZhExOpYO)
+![Course Details](https://drive.google.com/uc?id=1Fxilkc2WD-_jtwfkqvaDzH9Jira_NfD8)
+![Enroll Page](https://drive.google.com/uc?id=1rxYDljEaPsUvcBDzrTAjkuyw7Nb6GQFR)
+![MyLearning Page](https://drive.google.com/uc?id=18schOAY-LOWKzLKtDiFtktfkEFqbU3ba)
+![Course Page](https://drive.google.com/uc?id=1RoFlFYLKdAZUCopMU5bXuVdi7qp4yVAX)
+![Module Page](https://drive.google.com/uc?id=1tz6vXHGASDgj5lQxdnqUEgJBOF1-od13)
 
 ## 🔹 Challenges & Lessons Learned
 
